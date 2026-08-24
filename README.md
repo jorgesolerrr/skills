@@ -10,10 +10,10 @@ skills/
     SKILL.md
 ```
 
-To expose a skill to Claude Code, symlink it into `~/.claude/skills/`:
+To expose a skill to Claude Code, link it into (junctions need no admin rights on Windows; symlinks do) `~/.claude/skills/`:
 
 ```powershell
-New-Item -ItemType SymbolicLink -Path "$HOME\.claude\skills\<skill-name>" -Target "$PWD\skills\<skill-name>"
+New-Item -ItemType Junction -Path "$HOME\.claude\skills\<skill-name>" -Target "$PWD\skills\<skill-name>"
 ```
 
 ## Sources
