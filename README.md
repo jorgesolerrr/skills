@@ -24,3 +24,13 @@ License: MIT (see `LICENSE-mattpocock`).
 Skills: ask-matt, code-review, codebase-design, diagnosing-bugs, domain-modeling, grill-with-docs,
 implement, improve-codebase-architecture, prototype, research, resolving-merge-conflicts,
 setup-matt-pocock-skills, tdd, to-spec, to-tickets, triage, wayfinder, wizard.
+
+### cathrynlavery/diagram-design
+
+Copied raw from the `skills/diagram-design/` folder of
+[cathrynlavery/diagram-design](https://github.com/cathrynlavery/diagram-design) at commit `648c2a5`
+(skill version 2.6). Includes `assets/`, `references/` and `scripts/` alongside `SKILL.md`.
+License: MIT (see `LICENSE-diagram-design`).
+
+Skills: diagram-design.
+
