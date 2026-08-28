@@ -1,0 +1,5 @@
+interface:
+  display_name: "Deepen Ticket"
+  short_description: "File improve-codebase candidates for the ticket branch (session 3 of 3)"
+policy:
+  allow_implicit_invocation: false

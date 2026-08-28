@@ -1,0 +1,5 @@
+interface:
+  display_name: "Review Ticket"
+  short_description: "Loop a cross-model review of the ticket branch until clean (session 2 of 3)"
+policy:
+  allow_implicit_invocation: false

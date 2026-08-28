@@ -1,0 +1,3 @@
+interface:
+  display_name: "Improve Codebase"
+  short_description: "Find deepening candidates, present them inline, grill the pick"

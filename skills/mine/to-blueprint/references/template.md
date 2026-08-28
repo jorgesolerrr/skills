@@ -2,19 +2,14 @@
 
 Copy the skeleton below into `docs/blueprints/<feature-slug>/BLUEPRINT.md` and fill every section in order. Keep the headings verbatim so blueprints are navigable as a set. Sections marked *(explanation)* carry the why and may hold a view. Sections marked *(reference)* describe, dry and complete.
 
-Diagram slots are image references to SVGs exported from `diagram-design` sources in `diagrams/`. Rules for choosing, drawing, and exporting them are in [`diagrams.md`](diagrams.md).
+Diagrams are Mermaid fences in place. Rules for choosing, drawing, and marking them are in [`diagrams.md`](diagrams.md).
 
 ---
 
 ````markdown
 # <Feature name>
 
-| | |
-|---|---|
-| **Status** | draft · approved · built · superseded |
-| **Source** | grilling session, <date> |
-| **Stamped at** | `<short commit sha>` (paths and symbols are true at this commit) |
-| **Owner** | <name> |
+Stamped at `<short commit sha>`: paths and symbols are true at this commit.
 
 ## At a glance *(explanation)*
 
@@ -36,29 +31,27 @@ One row per decision settled in the grilling. Numbered so later sections can cit
 |---|---|---|---|---|
 | D1 | <question the grilling asked> | <choice> | <alternatives> | <reason, one or two sentences> |
 
-## User stories *(reference)*
-
-A long numbered list. Each: As an <actor>, I want <feature>, so that <benefit>. Cover every path, including failure and edge paths.
-
-1. As a …, I want …, so that …
-
 ## Bird's-eye flow *(reference)*
 
 One diagram of the whole feature end to end. Boxes are modules or systems. Arrows carry the data or event that crosses. Cite decisions on the arrows where a decision picked the route, for example `D2`.
 
-![Data flow of <feature> from <entry> to <exit>](diagrams/birds-eye.svg)
+```mermaid
+flowchart LR
+```
 
-Source: [`birds-eye.html`](diagrams/birds-eye.html)
+Figure: data flow of <feature> from <entry> to <exit>.
 
 Prose walkthrough: one numbered step per arrow, in order.
 
 ## Module map *(reference)*
 
-Which modules are touched and how they depend on each other after the change. New modules carry `new`. Each module's public interface is listed under the diagram: the functions or types other modules call, with their signatures as prose or a type shape.
+Which modules are touched and how they depend on each other after the change. New modules carry the `new` class. Each module's public interface is listed under the diagram: the functions or types other modules call, with their signatures.
 
-![Dependency graph of the modules <feature> touches, new ones marked](diagrams/module-map.svg)
+```mermaid
+flowchart TB
+```
 
-Source: [`module-map.html`](diagrams/module-map.html)
+Figure: dependency graph of the modules <feature> touches, new ones marked.
 
 ### Interfaces
 
@@ -70,15 +63,23 @@ One subsection per flow named in the bird's-eye diagram. Each has a sequence dia
 
 ### Flow: <name>
 
-![Sequence of calls for <flow name>, with the data shape at each hop](diagrams/flow-<flow-slug>.svg)
+```mermaid
+sequenceDiagram
+```
 
-Source: [`flow-<flow-slug>.html`](diagrams/flow-<flow-slug>.html)
+Figure: sequence of calls for <flow name>, with the data shape at each hop.
 
 1. <step>: input `<shape>`, output `<shape>`.
 
-### Data shapes
+## Data shapes *(reference)*
 
-Types, schema changes, API contracts. A prototype snippet that encodes a decision more precisely than prose (a reducer, a state machine, a schema) is inlined here, trimmed to the decision-rich part, with a note that it came from a prototype.
+Every type the feature adds or changes, drawn as a class diagram with its fields and relations. Schema changes as an ER diagram. New types carry the `new` class. A code snippet appears only for a decision a diagram cannot hold, trimmed to that part.
+
+```mermaid
+classDiagram
+```
+
+Figure: types <feature> adds or changes and how they relate.
 
 ## File map *(reference)*
 
@@ -93,7 +94,7 @@ Every file the agent touches. `create`, `modify`, or `delete`. Stamped at the co
 - **Seams**: where the feature is tested and why that seam (cite the decision).
 - **What a good test looks like here**: external behavior only, no implementation details.
 - **Prior art**: existing tests of the same kind, by path.
-- **Cases**: numbered list of the behaviors the tests must cover, mapped to user stories.
+- **Cases**: numbered list of the behaviors the tests must cover, each naming its flow and the decision it protects.
 
 ## Out of scope *(reference)*
 
