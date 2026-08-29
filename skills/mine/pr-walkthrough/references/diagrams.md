@@ -1,6 +1,12 @@
 # Diagram rules for walkthroughs
 
-The render path (Mermaid fences in place, one `Figure:` line under each), the budgets, the label rules, and the layout rules are the ones in [`../../to-blueprint/references/diagrams.md`](../../to-blueprint/references/diagrams.md); the syntax per type is in [`../../to-blueprint/references/mermaid.md`](../../to-blueprint/references/mermaid.md). This file adds only what a walkthrough needs on top.
+The budgets, the label rules, and the layout rules are the ones in [`../../to-blueprint/references/diagrams.md`](../../to-blueprint/references/diagrams.md); the syntax per type is in [`mermaid.md`](mermaid.md). This file owns the render path and adds what a walkthrough needs on top.
+
+## Render path
+
+Diagrams are Mermaid fences inline in `WALKTHROUGH.md`. GitHub and the editor render them. The fence is the source: no `diagrams/` folder, no export. Under each fence, one line: `Figure: <the one sentence the diagram answers>`.
+
+When `mmdc` is on `PATH`, validate each fence once: paste it into a scratch `.mmd` and run `mmdc -i x.mmd -o x.svg`. A `Could not find Chrome` error is setup, not syntax; skip validation.
 
 ## The five diagrams
 

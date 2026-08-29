@@ -85,9 +85,10 @@ Skills: `skills/pstack/`: technical-writing, unslop.
 Skills authored here, not copied from an upstream source.
 
 - `skills/mine/to-blueprint/`: to-blueprint. Turns a finished grilling session into a visual, forever design
-  doc for one feature (`docs/blueprints/<slug>/BLUEPRINT.md`): decision log, bird's-eye and ground-level
-  diagrams as inline Mermaid, data shapes as class diagrams, file map, testing seams, open questions.
-  Rules condensed from `technical-writing`. No external diagram skill needed.
+  doc for one feature (`docs/blueprints/<slug>/BLUEPRINT.html`, one self-contained page): decision log,
+  bird's-eye and ground-level figures as inline SVG, data shapes as class figures, file map, testing seams,
+  open questions. Prose rules condensed from `technical-writing`; SVG rules and `self_check.py` distilled
+  from `diagram-design` to the six figure types a blueprint uses, so that skill never loads.
 - `skills/mine/pr-walkthrough/`: pr-walkthrough. Visual walkthrough of a PR or branch
   (`.walkthroughs/<slug>/`, self-ignored): change map, flow after the change, before-and-after flows, blast
   radius, changed data types, spec-match table against the linked issue's spec or blueprint, reading order,

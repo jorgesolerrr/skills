@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<!--
+  Blueprint template. Copy to docs/blueprints/<feature-slug>/BLUEPRINT.html and fill every section in order.
+  Keep the section headings and ids verbatim so blueprints are navigable as a set.
+  Sections marked (explanation) carry the why and may hold a view. Sections marked (reference) describe, dry and complete.
+  Figures are inline SVG drawn per references/svg/base.md and the type file named in references/diagrams.md.
+  Tokens: when the repo declares design tokens, map the :root variables below onto them. Otherwise keep these defaults.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blueprint: [Feature name]</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #f5f5f5;
+      --ink: #2d3142;
+      --muted: #4f5d75;
+      --soft: #7a8399;
+      --rule: rgba(45, 49, 66, 0.16);
+      --accent: #eb6c36;
+      --accent-tint: rgba(235, 108, 54, 0.08);
+      --link: #2e5aa8;
+      --new: #2e7d32;
+      --font-sans: 'Geist', system-ui, sans-serif;
+      --font-serif: 'Instrument Serif', Georgia, serif;
+      --font-mono: 'Geist Mono', ui-monospace, monospace;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --paper: #2d3142;
+        --ink: #f5f5f5;
+        --muted: #bfc0c0;
+        --soft: #8e98ac;
+        --rule: rgba(245, 245, 245, 0.16);
+        --accent: #f08a59;
+        --accent-tint: rgba(240, 138, 89, 0.10);
+        --link: #6a95d8;
+        --new: #66bb6a;
+      }
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 3rem 2rem 4rem;
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.55;
+      background: var(--paper);
+      color: var(--ink);
+    }
+    main { max-width: 960px; margin: 0 auto; }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 0 0 0.5rem;
+    }
+    h1 { font-family: var(--font-serif); font-weight: 400; font-size: 2.25rem; line-height: 1.1; margin: 0 0 0.5rem; }
+    h2 { font-family: var(--font-serif); font-weight: 400; font-size: 1.6rem; margin: 3rem 0 0.75rem; padding-top: 1rem; border-top: 1px solid var(--rule); }
+    h3 { font-size: 1rem; font-weight: 600; margin: 2rem 0 0.5rem; }
+    .mode { font-family: var(--font-mono); font-size: 0.7rem; color: var(--soft); margin-left: 0.5rem; letter-spacing: 0.08em; }
+    .stamp { font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); }
+    code, pre { font-family: var(--font-mono); font-size: 0.85em; }
+    code { background: rgba(127, 127, 127, 0.12); padding: 0.05em 0.3em; border-radius: 3px; }
+    pre { padding: 0.75rem 1rem; border: 1px solid var(--rule); border-radius: 6px; overflow-x: auto; }
+    pre code { background: none; padding: 0; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+    th, td { text-align: left; vertical-align: top; padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--rule); }
+    th { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+    figure { margin: 1.5rem 0; }
+    figure svg { display: block; width: 100%; height: auto; }
+    figcaption { font-family: var(--font-serif); font-style: italic; font-size: 0.95rem; color: var(--muted); margin-top: 0.5rem; }
+    .overflow { overflow-x: auto; }
+    ol, ul { padding-left: 1.4rem; }
+    li { margin: 0.25rem 0; }
+    dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.35rem 1.25rem; }
+    dt { font-family: var(--font-mono); font-size: 0.85rem; }
+    dd { margin: 0; }
+    footer { margin-top: 4rem; padding-top: 1rem; border-top: 1px solid var(--rule); font-family: var(--font-mono); font-size: 0.75rem; color: var(--soft); }
+  </style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Blueprint</p>
+  <h1>[Feature name]</h1>
+  <p class="stamp">Stamped at <code>[short commit sha]</code>: paths and symbols are true at this commit.</p>
+
+  <h2 id="at-a-glance">At a glance <span class="mode">explanation</span></h2>
+  <p>Three sentences. What the user gets, the shape of the solution, the one decision that most constrains it.</p>
+
+  <h2 id="problem">Problem <span class="mode">explanation</span></h2>
+  <p>The problem from the user's perspective. Specific: the situation they are in and what goes wrong.</p>
+
+  <h2 id="solution">Solution <span class="mode">explanation</span></h2>
+  <p>The solution from the user's perspective. What changes for them, not how.</p>
+
+  <h2 id="decision-log">Decision log <span class="mode">explanation</span></h2>
+  <p>One row per decision settled in the grilling. Numbered so later sections can cite <code>D3</code>.</p>
+  <div class="overflow">
+  <table>
+    <thead><tr><th>#</th><th>Decision</th><th>Chosen</th><th>Rejected</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>D1</td><td>[question the grilling asked]</td><td>[choice]</td><td>[alternatives]</td><td>[reason, one or two sentences]</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2 id="birds-eye">Bird's-eye flow <span class="mode">reference</span></h2>
+  <p>One figure of the whole feature end to end. Boxes are modules or systems. Arrows carry the data or event that crosses. Decision ids lead the label where a decision picked the route.</p>
+  <figure>
+    <!-- flowchart, left to right: references/svg/flowchart.md -->
+    <svg viewBox="0 0 960 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="fig-birdseye-title fig-birdseye-desc">
+      <title id="fig-birdseye-title">[Feature] from [entry] to [exit]</title>
+      <desc id="fig-birdseye-desc">[One sentence: what moves between which modules.]</desc>
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="var(--muted)"/></marker>
+        <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="var(--accent)"/></marker>
+        <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="var(--link)"/></marker>
+        <marker id="arrow-open" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polyline points="0 0, 8 3, 0 6" fill="none" stroke="var(--muted)" stroke-width="1.2"/></marker>
+      </defs>
+      <rect width="100%" height="100%" fill="var(--paper)"/>
+      <!-- zones, then arrows, then nodes -->
+    </svg>
+    <figcaption>Figure: data flow of [feature] from [entry] to [exit].</figcaption>
+  </figure>
+  <p>Prose walkthrough: one numbered step per arrow, in order.</p>
+  <ol>
+    <li>[step]</li>
+  </ol>
+
+  <h2 id="module-map">Module map <span class="mode">reference</span></h2>
+  <p>Which modules are touched and how they depend on each other after the change. New modules carry the <code>new</code> treatment.</p>
+  <figure>
+    <!-- ranked dependency graph, top to bottom: references/svg/module-map.md -->
+    <svg viewBox="0 0 960 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="fig-modules-title fig-modules-desc">
+      <title id="fig-modules-title">Modules [feature] touches</title>
+      <desc id="fig-modules-desc">[One sentence: which modules depend on which, and which are new.]</desc>
+      <rect width="100%" height="100%" fill="var(--paper)"/>
+    </svg>
+    <figcaption>Figure: dependency graph of the modules [feature] touches, new ones marked.</figcaption>
+  </figure>
+  <h3>Interfaces</h3>
+  <p>The functions or types other modules call, with their signatures.</p>
+  <dl>
+    <dt><code>moduleB.doThing(input: Shape): Result</code></dt>
+    <dd>[one line: what it does, who calls it]</dd>
+  </dl>
+
+  <h2 id="ground-level">Ground-level flows <span class="mode">reference</span></h2>
+  <p>One subsection per flow named in the bird's-eye figure. Each has a sequence (or a state machine when the flow is a lifecycle) whose participants are the functions from the module map, then a numbered step list naming the data shape at each hop.</p>
+
+  <h3 id="flow-name">Flow: [name]</h3>
+  <figure>
+    <!-- sequence: references/svg/sequence.md. Lifecycle: references/svg/state.md -->
+    <svg viewBox="0 0 960 480" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="fig-flow-name-title fig-flow-name-desc">
+      <title id="fig-flow-name-title">[Flow name]</title>
+      <desc id="fig-flow-name-desc">[One sentence: who calls whom with what, in order.]</desc>
+      <rect width="100%" height="100%" fill="var(--paper)"/>
+    </svg>
+    <figcaption>Figure: sequence of calls for [flow name], with the data shape at each hop.</figcaption>
+  </figure>
+  <ol>
+    <li>[step]: input <code>[shape]</code>, output <code>[shape]</code>.</li>
+  </ol>
+
+  <h2 id="data-shapes">Data shapes <span class="mode">reference</span></h2>
+  <p>Every type the feature adds or changes, drawn with its fields and relations. Schema changes as an ER figure. A code snippet appears only for a decision a figure cannot hold, trimmed to that part.</p>
+  <figure>
+    <!-- class diagram: references/svg/class.md. Tables: references/svg/er.md -->
+    <svg viewBox="0 0 960 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="fig-shapes-title fig-shapes-desc">
+      <title id="fig-shapes-title">Types [feature] adds or changes</title>
+      <desc id="fig-shapes-desc">[One sentence: the types, their key fields, and how they relate.]</desc>
+      <rect width="100%" height="100%" fill="var(--paper)"/>
+    </svg>
+    <figcaption>Figure: types [feature] adds or changes and how they relate.</figcaption>
+  </figure>
+
+  <h2 id="file-map">File map <span class="mode">reference</span></h2>
+  <p>Every file the agent touches. Stamped at the commit in the header; regenerate the existence check with <code>git ls-files [paths]</code>.</p>
+  <div class="overflow">
+  <table>
+    <thead><tr><th>Path</th><th>Action</th><th>What changes</th><th>Flow</th></tr></thead>
+    <tbody>
+      <tr><td><code>src/...</code></td><td>modify</td><td>[one line]</td><td>[flow name]</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2 id="testing">Testing <span class="mode">reference</span></h2>
+  <dl>
+    <dt>Seams</dt><dd>Where the feature is tested and why that seam (cite the decision).</dd>
+    <dt>A good test here</dt><dd>External behavior only, no implementation details.</dd>
+    <dt>Prior art</dt><dd>Existing tests of the same kind, by path.</dd>
+  </dl>
+  <h3>Cases</h3>
+  <ol>
+    <li>[behavior], flow [name], protects [Dn].</li>
+  </ol>
+
+  <h2 id="out-of-scope">Out of scope <span class="mode">reference</span></h2>
+  <p>What this blueprint deliberately leaves out, and where it goes instead if known.</p>
+
+  <h2 id="open-questions">Open questions <span class="mode">reference</span></h2>
+  <p>Points the grilling did not settle. Each with the options on the table and the recommended default. The agent building this stops and asks before acting on any of them.</p>
+  <ol>
+    <li>[question]. Options: [a], [b]. Default: [a].</li>
+  </ol>
+
+  <h2 id="glossary">Glossary <span class="mode">reference</span></h2>
+  <dl>
+    <dt>[term]</dt><dd>[one line, matching the project's domain glossary]</dd>
+  </dl>
+
+  <footer>Blueprint for [feature] · stamped at [sha] · [date]</footer>
+</main>
+</body>
+</html>
