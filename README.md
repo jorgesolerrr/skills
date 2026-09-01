@@ -50,6 +50,19 @@ foreach ($d in "$env:USERPROFILE\.claude\skills","$env:USERPROFILE\.cursor\skill
 Remove dead links with `cmd /c rmdir <link>` (never `Remove-Item -Recurse`, which follows the link into
 the repo), then re-run the link script.
 
+
+## Loading skills on Linux / macOS
+
+Same flattening with plain symlinks. From the repo root:
+
+```bash
+./link-skills.sh                    # links into ~/.claude/skills and ~/.codex/skills
+./link-skills.sh ~/.cursor/skills   # or any other target folder(s)
+```
+
+The script is re-runnable: it removes dangling links, adds new skills, and prints `CONFLICT` when a
+name already points elsewhere. Run it again after `git pull`.
+
 ## Sources
 
 ### mattpocock/skills
