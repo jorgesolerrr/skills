@@ -9,6 +9,7 @@ skills/
   mattpocock/<skill-name>/SKILL.md     forks of mattpocock/skills
   cathrynlavery/diagram-design/        fork of cathrynlavery/diagram-design
   pstack/<skill-name>/SKILL.md         forks of cursor/plugins (pstack)
+  greptile/<skill-name>/SKILL.md       forks of greptileai/skills
   mine/<skill-name>/SKILL.md           skills authored in this registry
 ```
 
@@ -92,6 +93,16 @@ Copied raw from the `pstack/skills/` folder of [cursor/plugins](https://github.c
 commit `4612556`. License: MIT, © Lauren Tan (see `LICENSE-cursor-pstack`).
 
 Skills: `skills/pstack/`: technical-writing, unslop.
+
+### greptileai/skills
+
+Copied from [greptileai/skills](https://github.com/greptileai/skills) at commit `646e2df` and trimmed to
+GitHub only: the platform-detection step and every GitLab (`glab`) and Perforce (`p4`) branch were removed,
+so the flows never ask for a code provider and only need `git` + `gh`. `cli-review` is unchanged and needs
+the `greptile` CLI. The `references/gitlab-api.md` files were dropped; `references/graphql-queries.md` is
+kept. License: MIT (see `LICENSE-greptile`).
+
+Skills: `skills/greptile/`: check-pr, cli-review, greploop.
 
 ### Local (this registry)
 
