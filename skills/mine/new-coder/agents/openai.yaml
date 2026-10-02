@@ -1,0 +1,5 @@
+interface:
+  display_name: "New Coder"
+  short_description: "Create a kinby coder factory on the playground hub for a repo"
+policy:
+  allow_implicit_invocation: false

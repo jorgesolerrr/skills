@@ -1,0 +1,5 @@
+interface:
+  display_name: "Merge Train"
+  short_description: "Address reviews and merge a set of PRs and stacks in order"
+policy:
+  allow_implicit_invocation: false

@@ -52,6 +52,15 @@ The maintainer invokes `/triage` and describes what they want in natural languag
 - "Let's look at #42" (issue or PR)
 - "Move #42 to ready-for-agent"
 - "What's ready for agents to pick up?"
+- `/triage --since #372`: a **batch**, see below.
+
+## Batch: `--since #N`
+
+Triage every open issue numbered N or above that is unlabeled or `needs-triage`, oldest first; issues below N are out of the batch. Run steps 1 and 3 of _Triage a specific issue or PR_ for each one (one subagent per issue when there are more than five), then present all recommendations in one table (issue, category, state, one-line reason, verification result) and wait for direction once. Then apply the outcomes the maintainer approved, grilling only the issues they pick for it.
+
+## Where triage output goes
+
+Write the agent brief, the `ready-for-human` brief, and the triage notes into the issue **description**: edit the body, keep the reporter's original text under a `## Original report` heading at the end, and put the disclaimer at the top. The description then stays the single current spec of the issue. Post a comment instead when the issue was opened by someone outside the project (the tracker config defines who counts as external), and for `wontfix` closing explanations.
 
 ## Show what needs attention
 
@@ -76,9 +85,9 @@ Show counts and a one-line summary per item. Let the maintainer pick.
 4. **Grill (if needed).** If the request needs fleshing out, call the Skill tool twice, for "grilling" and "domain-modeling", and grill it into shape a round of questions at a time, sharpening domain terms and updating `CONTEXT.md`/ADRs inline as decisions land.
 
 5. **Apply the outcome:**
-   - `ready-for-agent`: post an agent brief comment ([AGENT-BRIEF.md](AGENT-BRIEF.md)).
+   - `ready-for-agent`: write an agent brief ([AGENT-BRIEF.md](AGENT-BRIEF.md)) where _Where triage output goes_ says.
    - `ready-for-human`: same structure as an agent brief, but note why it can't be delegated (judgment calls, external access, design decisions, manual testing).
-   - `needs-info`: post triage notes (template below).
+   - `needs-info`: write triage notes (template below) where _Where triage output goes_ says, and mention the reporter in a short comment so they get notified.
    - For `wontfix`, close the issue, with the comment depending on *why*:
      - **Already implemented**: the change already exists in the codebase. Point to where it lives; do **not** write to `.out-of-scope/` (that KB is for *rejected* requests, not built ones).
      - **Rejected (bug)**: give a polite explanation, then close.

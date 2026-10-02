@@ -1,0 +1,5 @@
+interface:
+  display_name: "Graphify"
+  short_description: "Build and query a knowledge graph of a folder"
+policy:
+  allow_implicit_invocation: false

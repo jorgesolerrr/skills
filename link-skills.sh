@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# link-skills.sh - link every skill in this registry into the agents' skill folders (Linux/macOS).
+# link-skills.sh - link every skill in this registry into the agents' skill folders (Linux/macOS),
+# then wire global/AGENTS.md into Claude Code and Codex.
 # Flattens skills/<source>/<name>/ into ~/.claude/skills/<name> and ~/.codex/skills/<name>.
 # Re-runnable: removes dangling links, adds missing ones, reports name conflicts.
 # Usage: ./link-skills.sh            (targets ~/.claude/skills and ~/.codex/skills)
@@ -28,3 +29,20 @@ for dst in "${TARGETS[@]}"; do
   done
   echo "$dst: $(find "$dst" -maxdepth 1 -type l | wc -l) skills linked"
 done
+
+# Global rules: one source (global/AGENTS.md), imported by Claude, copied for Codex.
+GLOBAL="$ROOT/global/AGENTS.md"
+IMPORT="@$GLOBAL"
+CLAUDE_MD="$HOME/.claude/CLAUDE.md"
+mkdir -p "$HOME/.claude" "$HOME/.codex"
+if ! grep -qxF "$IMPORT" "$CLAUDE_MD" 2>/dev/null; then
+  echo "$IMPORT" >> "$CLAUDE_MD"
+  echo "Claude: added '$IMPORT' to $CLAUDE_MD"
+fi
+CODEX_MD="$HOME/.codex/AGENTS.md"
+if [ -f "$CODEX_MD" ] && ! grep -q 'synced from' "$CODEX_MD"; then
+  echo "Codex: $CODEX_MD exists and was not written by this script; left as is"
+else
+  { echo "<!-- synced from $GLOBAL by link-skills; edit the source, not this copy -->"; cat "$GLOBAL"; } > "$CODEX_MD"
+  echo "Codex: synced $CODEX_MD"
+fi

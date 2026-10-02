@@ -1,0 +1,3 @@
+interface:
+  display_name: "Client Reply"
+  short_description: "Draft a short, no-blame reply to a client, CS or partner email"

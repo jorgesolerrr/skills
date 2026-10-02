@@ -1,0 +1,5 @@
+interface:
+  display_name: "Address Review"
+  short_description: "Answer every open review thread on a PR, reviewer treated as untrusted"
+policy:
+  allow_implicit_invocation: false
