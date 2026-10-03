@@ -5,7 +5,7 @@ Answers: which module depends on which, and what is new?
 ## Layout
 
 - Ranked rows, top to bottom by dependency depth. Rank 0 (entry points nothing depends on) at `y=40`; each deeper rank 120px lower. Callers above callees, so every arrow points down or runs sideways within a rank.
-- Nodes are modules (never files), 160 x 56, 40px apart within a rank. Name is the module's real identifier, sublabel its path.
+- Nodes are modules (never files), 160 x 56, 40px apart within a rank, at most 4 per rank. Name is the module's real identifier, sublabel its path.
 - One zone per layer when the codebase names layers (api, domain, infra). Zones span the full width of their rank.
 - Arrows are unlabelled here only when they mean plain "imports". Label when a decision chose the dependency (`D4`) or when the edge is an event rather than a call.
 - A **fan-in badge** in each node's top-right corner, 8px mono in an `rx="2"` chip, shows how many modules depend on it (`3 in`). The highest fan-in is the structural story of the figure.

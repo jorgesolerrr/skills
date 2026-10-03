@@ -1,6 +1,6 @@
 # Walkthrough template
 
-Copy the skeleton below into `.walkthroughs/<pr-slug>/WALKTHROUGH.md` and fill every section in order. Keep the headings verbatim. Sections marked *(explanation)* carry the why and may hold a view. Sections marked *(reference)* describe, dry and complete. When there is no spec, drop **Link chain** and **Spec match** and write `none` for the spec in the header line. The retrospective is its own file, `RETRO.md`, shaped at the end of this page.
+Copy the skeleton below into `.walkthroughs/<slug>/WALKTHROUGH.md` and fill every section in order. Keep the headings verbatim. Sections marked *(explanation)* carry the why and may hold a view. Sections marked *(reference)* describe, dry and complete. When there is no spec, drop **Link chain** and **Spec match** and write `none` for the spec in the header line. The retrospective is its own file, `RETRO.md`, shaped at the end of this page.
 
 Diagrams are Mermaid fences in place. Rules are in [`diagrams.md`](diagrams.md).
 

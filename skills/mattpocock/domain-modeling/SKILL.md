@@ -1,6 +1,6 @@
 ---
 name: domain-modeling
-description: Build and sharpen a project's domain model. Use when discussing codebase terminology, writing or editing a CONTEXT.md, or recording or editing an ADR.
+description: Build and sharpen a project's domain model. Use when a domain term is fuzzy, overloaded or contradicted, when writing or editing CONTEXT.md, or when recording an ADR.
 ---
 
 # Domain Modeling

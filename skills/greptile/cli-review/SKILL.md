@@ -1,14 +1,13 @@
 ---
 name: cli-review
 description: >
-  Runs a Greptile CLI review for the current local branch, installing or authenticating the CLI
-  when needed, then summarizes JSON findings for the user. Use when the user wants Greptile
-  feedback before opening a PR, outside a hosted PR review flow, or directly from a local checkout.
+  Run the Greptile CLI on the local branch and summarize its findings. Use when the user wants
+  Greptile feedback before a PR exists.
 license: MIT
 metadata:
   author: greptileai
   version: "1.0"
-allowed-tools: Bash(git:*) Bash(greptile:*) Bash(command:*) Bash(curl:*) Bash(npm:*)
+allowed-tools: Bash(git:*) Bash(greptile:*) Bash(command:*) Bash(npm:*)
 ---
 
 # CLI Review
@@ -41,12 +40,6 @@ If it is missing, do not install it automatically. Ask the user for permission, 
 npm i -g greptile
 ```
 
-If npm is unavailable, offer the shell installer fallback:
-
-```bash
-curl -fsSL "https://greptile.com/cli/install" | sh
-```
-
 After installation, re-run `command -v greptile`.
 
 ### 3. Ensure authentication
@@ -57,13 +50,7 @@ Check the signed-in account:
 greptile whoami
 ```
 
-If the CLI reports that authentication is missing, run:
-
-```bash
-greptile login
-```
-
-Wait for the user to complete the login flow before continuing.
+If not signed in, print `greptile login` for the user to run, and wait for them to confirm.
 
 ### 4. Run the review
 
@@ -73,17 +60,11 @@ Prefer JSON output:
 greptile review --json
 ```
 
-If JSON output is unsupported or fails with a usage error, fall back to:
-
-```bash
-greptile review --agent
-```
-
-Do not hide the raw command failure if both commands fail. Summarize the failing command and the next action the user needs to take.
+For a stacked branch pass `-b <base>`; if `--json` fails, show the raw error.
 
 ### 5. Summarize results
 
-Parse JSON output when available and report:
+Parse the JSON output and report:
 
 - Review status
 - Number of findings
@@ -91,4 +72,4 @@ Parse JSON output when available and report:
 - Files that need edits
 - Suggested next command or fix path
 
-When output is plain text, preserve the same structure as much as possible. Keep the summary concise and focused on actionable findings.
+Keep the summary concise and focused on actionable findings.

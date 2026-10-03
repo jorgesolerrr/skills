@@ -66,9 +66,8 @@ Copied raw from [mattpocock/skills](https://github.com/mattpocock/skills) at com
 be modified locally. Not installed as a plugin — edits here are intentional forks.
 License: MIT (see `LICENSE-mattpocock`).
 
-- `skills/mattpocock/`: ask-matt, code-review, codebase-design, diagnosing-bugs, domain-modeling, grill-me,
-  grill-with-docs, grilling, handoff, implement, improve-codebase-architecture, prototype, research,
-  resolving-merge-conflicts, retro (depends on `writing-for-agents`), setup-matt-pocock-skills, tdd, teach,
+- `skills/mattpocock/`: ask-matt, codebase-design, diagnosing-bugs, domain-modeling, grill-with-docs,
+  grilling, handoff, implement, prototype, research, resolving-merge-conflicts, retro (depends on `writing-for-agents`), setup-matt-pocock-skills, tdd, teach,
   to-questionnaire, to-spec, to-tickets, triage, wait-what, wayfinder, wizard, writing-for-agents.
 
 Local changes to the forks:
@@ -78,6 +77,10 @@ Local changes to the forks:
   so parallel agents don't produce conflicting PRs.
 - `triage` takes `--since #N` (batch-triage every untriaged issue from N up, one recommendation table, one
   approval) and writes briefs and triage notes into the issue description instead of new comments.
+- `code-review`, `improve-codebase-architecture` and `grill-me` were dropped: `adversarial-review`,
+  `improve-codebase` and `grilling` replace them. `ask-matt` routes to the local skills instead
+  (`implement-ticket` → `review-ticket` → `deepen-ticket`, `address-review`, `merge-train`), and `implement`
+  and `tdd` hand review to `adversarial-review`.
 
 ### cathrynlavery/diagram-design
 
@@ -99,9 +102,11 @@ Skills: `skills/pstack/`: technical-writing, unslop.
 
 Copied from [greptileai/skills](https://github.com/greptileai/skills) at commit `646e2df` and trimmed to
 GitHub only: the platform-detection step and every GitLab (`glab`) and Perforce (`p4`) branch were removed,
-so the flows never ask for a code provider and only need `git` + `gh`. `cli-review` is unchanged and needs
-the `greptile` CLI. The `references/gitlab-api.md` files were dropped; `references/graphql-queries.md` is
-kept. License: MIT (see `LICENSE-greptile`).
+so the flows never ask for a code provider and only need `git` + `gh` (no `jq`: filters use `gh --jq`).
+Review-thread state comes from GraphQL `reviewThreads`, since the REST comments API has none. `greploop` is
+manual-only. `cli-review` needs the `greptile` CLI and prints `greptile login` for the user instead of running
+it. The `references/gitlab-api.md` files were dropped; `references/graphql-queries.md` is kept. License: MIT
+(see `LICENSE-greptile`).
 
 Skills: `skills/greptile/`: check-pr, cli-review, greploop.
 
@@ -143,7 +148,7 @@ Skills authored here, not copied from an upstream source.
   Codex), each on the model its own config sets. A one-word preflight call checks the CLI, auth and credits
   first, falling back to same-model subagents. Reviewers only read; the caller passes the check result. Fixed
   point optional (defaults to the merge base). With a round history it runs a delta round: only the delta since
-  the last round, and new findings on unchanged code become suggestions. Findings are tagged `[hard]`
+  the last round, and new Standards findings on unchanged code become suggestions. Findings are tagged `[hard]`
   (documented-standard breach, any spec mismatch) or `[suggestion]`; ends with `Clean`, `Not clean`, or
   `Incomplete` (a reviewer gave no verdict; never auto-retried), so a loop can stop on it. Smell baseline
   lives in `references/smells.md`.

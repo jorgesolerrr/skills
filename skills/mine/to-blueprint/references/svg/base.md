@@ -15,18 +15,16 @@ Colors and fonts are CSS variables declared once in the page `<style>` (see [`..
 | `--muted` | default arrow stroke, secondary text |
 | `--soft` | sublabels, arrow labels |
 | `--rule` | hairlines, lifelines, frame borders |
-| `--accent` | the 1 or 2 focal elements of a figure, and nothing else |
+| `--accent` | the focal elements of a figure (the accent rule in [`../diagrams.md`](../diagrams.md)), and nothing else |
 | `--accent-tint` | fill of an accent-stroked node |
 | `--link` | arrows that cross a process or network boundary |
 | `--new` | stroke of a node the feature adds |
 
 When the repo already declares design tokens (CSS custom properties, a Tailwind theme, a `.diagram-design` marker), map these nine variables onto them in the template's `:root` block. Otherwise keep the template defaults. The figures themselves never change.
 
-**Focal rule.** `--accent` goes on the one or two elements the reader must notice: the headline message, the state that matters, the aggregate root. A figure with four accent elements has not decided what is focal.
-
 ## The 4px grid
 
-Every coordinate, size, gap, and font size is divisible by 4. Stroke widths (0.8, 1, 1.2) and opacities are exempt. A coordinate ending in 1, 2, 3, 5, 6, 7 or 9 is wrong.
+Every coordinate, size, gap, and font size is divisible by 4. Stroke widths (0.8, 1, 1.2) and opacities are exempt. Check: `value % 4 == 0`.
 
 | What | Values |
 |---|---|
@@ -61,7 +59,7 @@ Background, zones, arrows, nodes, labels. Arrows go before nodes so the node fil
 </svg>
 ```
 
-Accessibility contract, checked by `scripts/self_check.py`: `role="img"`, `aria-labelledby` naming title then desc, `<title>` as the first child, both filled, IDs prefixed with the figure's slug (`fig-<slug>-title`), never bare `title`/`desc`. The `<desc>` says what the figure shows in content terms, never in shapes.
+Accessibility contract, checked by `self_check.py`: `role="img"`, `aria-labelledby` naming title then desc, `<title>` as the first child, both filled, IDs never bare `title`/`desc`. Prefix the IDs with the figure's slug (`fig-<slug>-title`) so they stay unique on the page. The `<desc>` says what the figure shows in content terms, never in shapes.
 
 Marker IDs are shared across the page, so define them once in the first `<svg>` and reuse `url(#arrow)` in every later figure. Width is `viewBox` 960; height is the content plus 48 when a legend is needed.
 
@@ -71,11 +69,11 @@ Marker IDs are shared across the page, so define them once in the first `<svg>` 
 <rect x="X" y="Y" width="160" height="56" rx="6" fill="var(--paper)"/>
 <rect x="X" y="Y" width="160" height="56" rx="6" fill="FILL" stroke="STROKE" stroke-width="1"/>
 <rect x="X+8" y="Y+8" width="32" height="12" rx="2" fill="none" stroke="STROKE" stroke-opacity="0.4" stroke-width="0.8"/>
-<text x="X+24" y="Y+17" font-size="8" font-family="var(--font-mono)" fill="STROKE" fill-opacity="0.8"
+<text x="X+24" y="Y+16" font-size="8" font-family="var(--font-mono)" fill="STROKE" fill-opacity="0.8"
       text-anchor="middle" letter-spacing="0.08em">MOD</text>
-<text x="CX" y="CY+2" font-size="12" font-weight="600" font-family="var(--font-sans)" fill="var(--ink)"
+<text x="CX" y="CY+4" font-size="12" font-weight="600" font-family="var(--font-sans)" fill="var(--ink)"
       text-anchor="middle">orders.service</text>
-<text x="CX" y="CY+18" font-size="8" font-family="var(--font-mono)" fill="var(--muted)"
+<text x="CX" y="CY+20" font-size="8" font-family="var(--font-mono)" fill="var(--muted)"
       text-anchor="middle">src/orders/service.ts</text>
 ```
 
@@ -125,7 +123,7 @@ Every arrow carries what crosses it, on an opaque mask with a visible 6 to 10px 
 
 ```svg
 <rect x="MX-40" y="AY-20" width="80" height="12" rx="2" fill="var(--paper)"/>
-<text x="MX" y="AY-11" font-size="8" font-family="var(--font-mono)" fill="var(--soft)"
+<text x="MX" y="AY-12" font-size="8" font-family="var(--font-mono)" fill="var(--soft)"
       text-anchor="middle">OrderCreated</text>
 ```
 
@@ -149,7 +147,5 @@ Only when the figure uses a treatment the reader cannot infer (the `new` dash, t
 ## Check before moving on
 
 - The figure answers its `Figure:` sentence and nothing more. Any node or arrow that could go without loss goes.
-- Within the type's budget in [`../diagrams.md`](../diagrams.md).
-- Accent on at most two elements. Every label is a real symbol. Every arrow labelled.
+- Within the budget, label, and accent rules of [`../diagrams.md`](../diagrams.md).
 - No diagonal, no overlapping strokes, no label on a stroke, everything on the 4px grid.
-- `python scripts/self_check.py docs/blueprints/<slug>/BLUEPRINT.html` prints `OK`.

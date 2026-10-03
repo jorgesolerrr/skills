@@ -4,7 +4,7 @@ Answers: in what order do calls happen, and what crosses each hop?
 
 ## Layout
 
-- Participants are function or module boxes (160 x 40) in a row at `y=24`, 200px between centres, in the order they first act. A new participant takes the `new` stroke.
+- Participants are function or module boxes (160 x 40) in a row at `y=24`, the first centre at `x=112` and 184px between centres, so five fill the 960 viewBox. They appear in the order they first act. A new participant takes the `new` stroke.
 - A **lifeline** drops from each box to the bottom: `<line stroke="var(--rule)" stroke-width="1" stroke-dasharray="3 3"/>`.
 - Messages are horizontal arrows between lifelines, top to bottom in time, 32px apart on the grid. An arrow pointing up reverses time and is a hard fail.
 - An **activation bar** (8px wide, `fill="var(--ink)" fill-opacity="0.06" stroke="var(--muted)" stroke-width="0.8"`) sits on the lifeline while that participant holds control. Nest by offsetting 4px. Every bar closes.
@@ -44,4 +44,4 @@ The frame spans only the lifelines that take part, inset 12px past their centres
 
 ## Budget
 
-At most 7 participants, 15 messages, 1 fragment, 2 accent elements. Past that, split the flow at the seam: happy path in one figure, failure or refresh in the next.
+At most 5 participants, 15 messages, 1 fragment, 2 accent elements. Past that, split the flow at the seam: happy path in one figure, failure or refresh in the next.

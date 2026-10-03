@@ -28,7 +28,7 @@ I dictate many prompts by voice, so names arrive garbled. Read them as:
 
 ## Browser
 
-Browser testing runs in Playwright's bundled Chromium with its own profile; keep sign-ins as saved storage state. My own Chrome stays untouched: end only the processes you started, by their PID.
+Browser testing runs in Playwright's bundled Chromium with its own profile; keep sign-ins as saved storage state. My own Chrome stays untouched: end only the processes you started, by their PID, and use the Claude in Chrome tools only when I ask for them.
 
 ## Logins and secrets
 

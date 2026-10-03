@@ -1,16 +1,16 @@
 ---
 name: improve-codebase
-description: "Scan a codebase (or the modules another skill names) for deepening opportunities, present them inline as Markdown cards with Mermaid before/after diagrams for the user to pick from, then grill through whichever one they choose. Use when the user asks where the architecture hurts, wants refactor candidates, or a skill hands over a finished diff for deepening suggestions."
+description: "Survey a codebase, or the modules a calling skill names, for deepening opportunities, then grill the one the user picks. Use when the user asks where the architecture hurts or wants refactor candidates."
 ---
 
 # Improve codebase
 
 Surface architectural friction and propose **deepening opportunities**: refactors that turn shallow modules into deep ones. The aim is testability and AI-navigability.
 
-This command is _informed_ by the project's domain model and built on a shared design vocabulary:
+This skill is _informed_ by the project's domain model and built on a shared design vocabulary:
 
-- Call the Skill tool with "codebase-design" for the architecture vocabulary (**module**, **interface**, **depth**, **seam**, **adapter**, **leverage**, **locality**) and its principles (the deletion test, "the interface is the test surface", "one adapter = hypothetical seam, two = real"). Use these terms exactly in every suggestion, and don't drift into "component," "service," "API," or "boundary."
-- The domain language in `CONTEXT.md` gives names to good seams; ADRs in `docs/adr/` record decisions this command should not re-litigate.
+- Call the Skill tool with "codebase-design" for the architecture vocabulary (**module**, **interface**, **depth**, **seam**, **adapter**, **leverage**, **locality**) and its principles (the deletion test, "the interface is the test surface", "one adapter = hypothetical seam, two = real"). Its [`DEEPENING.md`](../codebase-design/DEEPENING.md) defines the four dependency categories a card's badge names.
+- The domain language in `CONTEXT.md` gives names to good seams; ADRs in `docs/adr/` record decisions this skill should not re-litigate.
 
 ## Process
 
@@ -21,9 +21,9 @@ This command is _informed_ by the project's domain model and built on a shared d
 - If the user or a calling skill named a direction (a module, a subsystem, a pain point, the modules a diff touched), take it, and skip the inference below.
 - Otherwise, walk back a good stretch of the commit history (`git log --oneline`) to find the codebase's hot spots, the files and areas that keep coming up, and let those paths pull your attention first. If the changes are scattered with no clear hot spot, widen the net.
 
-Read the project's domain glossary (`CONTEXT.md`) and any ADRs in the area you're touching first.
+Read the project's domain glossary (`CONTEXT.md`, if it exists) and any ADRs in the area you're touching first.
 
-Then spawn a sub-agent to walk the codebase. Don't follow rigid heuristics; explore organically and note where you experience friction:
+Then spawn a sub-agent to walk the codebase. Brief it with the scope and the `codebase-design` vocabulary. It explores organically and notes where it experiences friction:
 
 - Where does understanding one concept require bouncing between many small modules?
 - Where are modules **shallow**, with an interface nearly as complex as the implementation?
@@ -31,30 +31,20 @@ Then spawn a sub-agent to walk the codebase. Don't follow rigid heuristics; expl
 - Where do tightly-coupled modules leak across their seams?
 - Which parts of the codebase are untested, or hard to test through their current interface?
 
-Apply the **deletion test** to anything you suspect is shallow: would deleting it concentrate complexity, or just move it? A "yes, concentrates" is the signal you want.
+It applies the **deletion test** to anything it suspects is shallow: would deleting it concentrate complexity, or just move it? A "yes, concentrates" is the signal you want. It returns each suspect module with its files and its deletion-test verdict.
+
+Done when every named module or hot spot in scope has been walked and you hold 3 to 6 candidates, or can say why there are fewer.
 
 ### 2. Present candidates inline
 
-Write the candidates straight into your reply as Markdown, nothing on disk. Diagrams are Mermaid fences where a graph, flow, or sequence communicates the structure; everywhere else a short table or list carries the shape. Each candidate gets a **before/after visualisation**. Be visual.
-
-For each candidate, render a card with:
-
-- **Files**: which files/modules are involved
-- **Problem**: why the current architecture is causing friction
-- **Solution**: plain English description of what would change
-- **Benefits**: explained in terms of locality and leverage, and how tests would improve
-- **Before / After diagram**: a pair of fences, illustrating the shallowness and the deepening
-- **Recommendation strength**: one of `Strong`, `Worth exploring`, `Speculative`
-
-End with a **Top recommendation** section: which candidate you'd tackle first and why.
-
-**Use CONTEXT.md vocabulary for the domain, and the `/codebase-design` vocabulary for the architecture.** If `CONTEXT.md` defines "Order," talk about "the Order intake module," not "the FooBarHandler," and not "the Order service."
+Write the candidates into your reply as Markdown. Render each candidate as a card per [references/report.md](references/report.md), which also holds the scaffold, the diagram patterns, and the tone.
 
 **ADR conflicts**: if a candidate contradicts an existing ADR, only surface it when the friction is real enough to warrant revisiting the ADR. Mark it clearly in the card (a blockquote callout: _"contradicts ADR-0007, but worth reopening because…"_). Don't list every theoretical refactor an ADR forbids.
 
-See [references/report.md](references/report.md) for the card layout, diagram patterns, and tone.
+Interfaces come later, in the grilling loop. Once the candidates are presented:
 
-Do NOT propose interfaces yet. After the candidates are presented, ask the user: "Which of these would you like to explore?" When a calling skill invoked this one, that question is where you hand back; the calling skill does not pick.
+- **Called by the user**: ask "Which of these would you like to explore?"
+- **Called by another skill**: skip the question and the grilling loop; write or return the cards where the caller asks, then stop.
 
 ### 3. Grilling loop
 

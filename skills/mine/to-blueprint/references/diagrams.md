@@ -6,7 +6,7 @@ Every diagram answers one question a reader could not answer faster from a parag
 
 Diagrams are inline `<svg>` figures in `BLUEPRINT.html`, hand-laid per [`svg/base.md`](svg/base.md) and the type file below. The HTML is the source: no `diagrams/` folder, no export, no script. Each `<figure>` ends with a `<figcaption>`: `Figure: <the one sentence the diagram answers>`.
 
-Validate the finished file once: `python <skill-dir>/scripts/self_check.py docs/blueprints/<slug>/BLUEPRINT.html`. It checks the accessible-SVG contract and that the page loads nothing remote beyond Google Fonts.
+`scripts/self_check.py`, run in step 4 of the skill, checks the accessible-SVG contract, that the page loads nothing remote beyond Google Fonts, and that no template placeholder is left.
 
 ## Pick the type by the question
 
@@ -26,7 +26,7 @@ Bird's-eye is the flowchart. Module map is the dependency graph. Ground level is
 
 - **Bird's-eye**: at most 9 nodes. Past that, the feature has more than one story; split into two blueprints or collapse a subsystem into one node.
 - **Module map**: at most 12 nodes.
-- **Ground level**: at most 7 participants and 15 messages per sequence. Past that, split the flow at the seam.
+- **Ground level**: at most 5 participants and 15 messages per sequence. Past that, split the flow at the seam.
 - **Data shapes**: at most 8 classes per diagram, fields that matter to a decision only.
 
 Budget is a legibility rule. A diagram over budget gets split, never squeezed.
@@ -48,4 +48,4 @@ A node the feature adds takes the `new` treatment from `svg/base.md` (green dash
 - Group by ownership with a zone, at most one level deep.
 - Failure paths are dashed.
 - Sequence participants appear in the order they first act.
-- Accent on at most two elements per figure. The rest is ink and muted.
+- Accent on at most two elements per figure: the ones the reader must notice, such as the headline message, the state that matters, or the aggregate root. The rest is ink and muted.

@@ -56,11 +56,11 @@ The maintainer invokes `/triage` and describes what they want in natural languag
 
 ## Batch: `--since #N`
 
-Triage every open issue numbered N or above that is unlabeled or `needs-triage`, oldest first; issues below N are out of the batch. Run steps 1 and 3 of _Triage a specific issue or PR_ for each one (one subagent per issue when there are more than five), then present all recommendations in one table (issue, category, state, one-line reason, verification result) and wait for direction once. Then apply the outcomes the maintainer approved, grilling only the issues they pick for it.
+Triage every open issue numbered N or above that is unlabeled or `needs-triage`, oldest first; issues below N are out of the batch. When PRs are in scope, the batch also takes the external PRs numbered N or above, tagged `[PR]`. Run steps 1 and 3 of _Triage a specific issue or PR_ for each one (one subagent per item when there are more than five, each in its own `git worktree`), then present all recommendations in one table (item, category, state, one-line reason, verification result) and wait for direction once. Then apply the outcomes the maintainer approved, grilling only the issues they pick for it.
 
 ## Where triage output goes
 
-Write the agent brief, the `ready-for-human` brief, and the triage notes into the issue **description**: edit the body, keep the reporter's original text under a `## Original report` heading at the end, and put the disclaimer at the top. The description then stays the single current spec of the issue. Post a comment instead when the issue was opened by someone outside the project (the tracker config defines who counts as external), and for `wontfix` closing explanations.
+Write the agent brief, the `ready-for-human` brief, and the triage notes into the issue **description**: edit the body, keep the reporter's original text under a `## Original report` heading at the end, and put the disclaimer at the top. The description then stays the single current spec of the issue. Post a comment instead when the issue was opened by someone outside the project (the External reporter convention in `docs/agents/issue-tracker.md`), and for `wontfix` closing explanations.
 
 ## Show what needs attention
 
@@ -68,9 +68,9 @@ Query the issue tracker and present three buckets, oldest first:
 
 1. **Unlabeled**: never triaged.
 2. **`needs-triage`**: evaluation in progress.
-3. **`needs-info` with reporter activity since the last triage notes**: needs re-evaluation.
+3. **`needs-info` with reporter activity**: reporter comments dated after the latest `## Triage Notes (YYYY-MM-DD)` heading. Needs re-evaluation.
 
-When PRs are in scope, include external PRs in these buckets and tag each line `[PR]` or `[issue]`. Discovery surfaces only *external* PRs (the tracker config defines who counts as external), so a collaborator's in-flight PR is not triage work. This filter is discovery-only; an explicitly named PR is always triaged regardless of author.
+When PRs are in scope, include external PRs in these buckets and tag each line `[PR]` or `[issue]`. Discovery surfaces only *external* PRs (the External reporter convention in `docs/agents/issue-tracker.md`), so a collaborator's in-flight PR is not triage work. This filter is discovery-only; an explicitly named PR is always triaged regardless of author.
 
 Show counts and a one-line summary per item. Let the maintainer pick.
 
@@ -80,7 +80,7 @@ Show counts and a one-line summary per item. Let the maintainer pick.
 
 2. **Recommend.** Tell the maintainer your category and state recommendation with reasoning, plus a brief codebase summary relevant to the request (including whether it's already implemented). Wait for direction.
 
-3. **Verify the claim.** Before any grilling, check that the claim holds up. For a bug, reproduce it from the reporter's steps. For a PR, confirm the diff does what it claims: check it out, run the relevant tests or commands. Report what happened: confirmed (with code path), failed, or insufficient detail (a strong `needs-info` signal). A confirmed verification makes a much stronger agent brief.
+3. **Verify the claim.** Before any grilling, check that the claim holds up. For a bug, reproduce it from the reporter's steps. For a PR, confirm the diff does what it claims: check it out into its own `git worktree` (the main working tree stays on its branch), run the relevant tests or commands. Report what happened: confirmed (with code path), failed, or insufficient detail (a strong `needs-info` signal). A confirmed verification makes a much stronger agent brief.
 
 4. **Grill (if needed).** If the request needs fleshing out, call the Skill tool twice, for "grilling" and "domain-modeling", and grill it into shape a round of questions at a time, sharpening domain terms and updating `CONTEXT.md`/ADRs inline as decisions land.
 
@@ -101,7 +101,7 @@ If the maintainer says "move #42 to ready-for-agent", trust them and apply the r
 ## Needs-info template
 
 ```markdown
-## Triage Notes
+## Triage Notes (YYYY-MM-DD)
 
 **What we've established so far:**
 
@@ -114,8 +114,8 @@ If the maintainer says "move #42 to ready-for-agent", trust them and apply the r
 - question 2
 ```
 
-Capture everything resolved during grilling under "established so far" so the work isn't lost. Questions must be specific and actionable, not "please provide more info".
+Date the heading with today's date. Capture everything resolved during grilling under "established so far" so the work isn't lost. Questions must be specific and actionable, not "please provide more info".
 
 ## Resuming a previous session
 
-If prior triage notes exist on the issue or PR, read them, check whether the reporter has answered any outstanding questions, and present an updated picture before continuing. Don't re-ask resolved questions.
+If prior triage notes exist on the issue or PR, read them, check the reporter's comments dated after the latest notes for answers to the outstanding questions, and present an updated picture before continuing.

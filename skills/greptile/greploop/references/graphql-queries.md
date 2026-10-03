@@ -4,11 +4,12 @@ Useful GitHub GraphQL queries for working with PR review threads.
 
 ## Fetch unresolved review threads (with pagination)
 
-```graphql
-query($cursor: String) {
-  repository(owner: "OWNER", name: "REPO") {
-    pullRequest(number: PR_NUMBER) {
-      reviewThreads(first: 100, after: $cursor) {
+```bash
+gh api graphql --paginate -F owner='{owner}' -F repo='{repo}' -F pr=<PR_NUMBER> -f query='
+query($owner: String!, $repo: String!, $pr: Int!, $endCursor: String) {
+  repository(owner: $owner, name: $repo) {
+    pullRequest(number: $pr) {
+      reviewThreads(first: 100, after: $endCursor) {
         pageInfo {
           hasNextPage
           endCursor
@@ -28,10 +29,10 @@ query($cursor: String) {
       }
     }
   }
-}
+}' --jq '.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false)'
 ```
 
-Pass `-f cursor=ENDCURSOR` on subsequent requests if `hasNextPage` is `true`.
+`gh` fills `{owner}` and `{repo}`, and `--paginate` follows `endCursor` until `hasNextPage` is `false`.
 
 ## Resolve a single review thread
 
@@ -67,21 +68,13 @@ mutation {
 gh pr view <PR_NUMBER> --json title,body,state,reviews,comments,headRefName,statusCheckRollup
 ```
 
-## Fetch inline review comments (REST)
-
-```bash
-gh api repos/{owner}/{repo}/pulls/<PR_NUMBER>/comments
-```
-
 ## Fetch general PR comments edited in place (REST)
 
 General PR comments are issue comments. Greptile may update one summary comment repeatedly, so select by `updated_at` instead of `created_at`:
 
 ```bash
 gh api --paginate "repos/{owner}/{repo}/issues/<PR_NUMBER>/comments?per_page=100" \
-  | jq -s 'add
-    | map(select(.user.login | test("greptile"; "i")))
-    | sort_by(.updated_at)
-    | last
-    | {author: .user.login, updated_at, body}'
+  --jq '.[] | select(.user.login | test("greptile"; "i")) | {author: .user.login, updated_at, body}'
 ```
+
+`--jq` runs once per page, so pick the comment with the latest `updated_at` from the output.

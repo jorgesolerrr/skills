@@ -57,8 +57,6 @@ If no path was given, use `.` (current directory). Do not ask the user for a pat
 
 If the path argument starts with `https://github.com/` or `http://github.com/`, treat it as a GitHub URL - run Step 0 before anything else, then continue with the resolved local path.
 
-Follow these steps in order. Do not skip steps.
-
 ### Step 0 - GitHub repos and multi-path merge (only if a URL or several paths)
 
 Only when the path is one or more `https://github.com/...` URLs, or several local subfolders to merge. See `references/github-and-merge.md` for the clone, cross-repo merge, and monorepo flow, then continue with the resolved local path. A plain local path skips this step.
@@ -138,7 +136,7 @@ Then act on it:
   - Concatenate all file lists across all types (`code`, `document`, `paper`, `image`, `video`).
   - Filter out any path that starts with `scan_root + "/graphify-out/"` to exclude converted sidecars.
   - For each file, strip the `scan_root` prefix and take the first path component. Files directly in `scan_root` with no subdirectory count as `(root)`.
-  - If all files are in `(root)` with no subdirectories, do not ask to narrow — no subfolders exist. Instead suggest `--no-cluster` to skip the expensive clustering step and proceed.
+  - If all files are in `(root)` with no subdirectories, do not ask to narrow — no subfolders exist. Instead suggest `graphify extract <path> --no-cluster` to skip the expensive clustering step and proceed.
   - Otherwise rank by count, show the top 5 with file counts, then ask which subfolder to run on. Wait for the user's answer before proceeding.
 - Otherwise: proceed directly to Step 2.5 if video files were detected, or Step 3 if not.
 
@@ -248,7 +246,9 @@ Only dispatch subagents for files listed in `graphify-out/.graphify_uncached.txt
 
 Load files from `graphify-out/.graphify_uncached.txt`. Split into chunks of 20-25 files each. Each image gets its own chunk (vision needs separate context). When splitting, group files from the same directory together so related artifacts land in the same chunk and cross-file relationships are more likely to be extracted.
 
-**Step B2 - Dispatch ALL subagents in a single message (Codex)**
+**Step B2 - Dispatch ALL subagents in a single message**
+
+> **Claude Code:** Call the Agent tool once per chunk, ALL in the same message so they run in parallel, with `subagent_type="general-purpose"` and the extraction prompt (below) as the prompt. Each agent returns its JSON inline; Step B3 writes it to disk.
 
 > **Codex platform:** Uses `spawn_agent` + `wait_agent` + `close_agent` instead of the Agent tool.
 > Requires `multi_agent = true` under `[features]` in `~/.codex/config.toml`.
@@ -273,15 +273,14 @@ See `references/extraction-spec.md` for the compact subagent prompt (rules, node
 
 **Step B3 - Collect, cache, and merge**
 
-Wait for all subagents. For each result:
-- Check that `graphify-out/.graphify_chunk_NN.json` exists on disk — this is the success signal
-- If the file exists and contains valid JSON with `nodes` and `edges`, include it and save to cache
-- If the file is missing, the subagent was likely dispatched as read-only (Explore type) — print a warning: "chunk N missing from disk — subagent may have been read-only. Re-run with general-purpose agent." Do not silently skip.
+Wait for all subagents. Write each subagent's returned JSON to `graphify-out/.graphify_chunk_NN.json` yourself, then check each result:
+- If the file contains valid JSON with `nodes` and `edges`, include it and save to cache
+- If a subagent returned no JSON (for example it wrote prose, or tried to write files itself), print a warning: "chunk N returned no JSON. Re-run with a general-purpose agent that returns JSON inline." Do not silently skip.
 - If a subagent failed or returned invalid JSON, print a warning and skip that chunk - do not abort
 
 If more than half the chunks failed or are missing, stop and tell the user to re-run and ensure `subagent_type="general-purpose"` is used.
 
-Merge all chunk files into `.graphify_semantic_new.json`. **After each Agent call completes, read the real token counts from the Agent tool result's `usage` field and write them back into the chunk JSON before merging** — the chunk JSON itself always has placeholder zeros. Then run:
+Merge all chunk files into `.graphify_semantic_new.json`. **After each Agent call completes, read the real token counts from the Agent tool result's `usage` field and write them back into the chunk JSON before merging** — the chunk JSON itself always has placeholder zeros. Then run (Codex: skip this script; `.graphify_semantic_new.json` is already written):
 ```bash
 $(cat graphify-out/.graphify_python) -c "
 import json, glob

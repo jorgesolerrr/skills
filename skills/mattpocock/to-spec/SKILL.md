@@ -4,9 +4,9 @@ description: "Turn the current conversation into a spec and publish it to the pr
 disable-model-invocation: true
 ---
 
-This skill takes the current conversation context and codebase understanding and produces a spec. Do NOT interview the user; just synthesize what you already know.
+This skill takes the current conversation context and codebase understanding and produces a spec. Ask the user nothing except the single seam confirmation in step 2; synthesize everything else.
 
-The issue tracker and triage label vocabulary should have been provided to you. If not, tell the user to run `/setup-matt-pocock-skills`.
+Read `docs/agents/issue-tracker.md` (the tracker) and `docs/agents/triage-labels.md` (the label strings). If either is missing, tell the user to run `/setup-matt-pocock-skills` and stop.
 
 ## Process
 
@@ -16,7 +16,7 @@ The issue tracker and triage label vocabulary should have been provided to you. 
 
 Check with the user that these seams match their expectations.
 
-3. Write the spec using the template below, then publish it to the project issue tracker. Apply the `ready-for-agent` triage label - no need for additional triage.
+3. Write the spec using the template below, then publish it to the project issue tracker. If the spec will go to an agent whole, apply the `ready-for-agent` triage label (no further triage needed). If it will be split into tickets, leave it unlabelled and tell the user to run `/to-tickets` on it.
 
 <spec-template>
 
@@ -60,7 +60,7 @@ Exception: if a prototype produced a snippet that encodes a decision more precis
 
 A list of testing decisions that were made. Include:
 
-- A description of what makes a good test (only test external behavior, not implementation details)
+- The seams agreed in step 2, and what makes a good test at them (only test external behavior, not implementation details)
 - Which modules will be tested
 - Prior art for the tests (i.e. similar types of tests in the codebase)
 

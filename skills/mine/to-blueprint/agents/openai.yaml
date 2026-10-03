@@ -1,0 +1,5 @@
+interface:
+  display_name: "To Blueprint"
+  short_description: "Turn a grilling session into a visual design doc"
+policy:
+  allow_implicit_invocation: false

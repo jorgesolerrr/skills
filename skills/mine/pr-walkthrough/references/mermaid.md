@@ -1,8 +1,8 @@
-# Mermaid syntax for the five constructs
+# Mermaid syntax for walkthrough diagrams
 
 Condensed from [Agents365-ai/mermaid-skill](https://github.com/Agents365-ai/mermaid-skill) (MIT) to the types [`diagrams.md`](diagrams.md) uses. Read the section for the type you are drawing.
 
-## Flowchart: bird's-eye, module map, change map, blast radius
+## Flowchart: change map, flow after, blast radius
 
 ```mermaid
 flowchart LR
@@ -40,9 +40,9 @@ flowchart LR
 
 Labels: `A -- "OrderCreated" --> B` or `A -->|"D3: retry"| B`. Fan-out: `A & B --> C`, `C --> D & E`. Node ids are bare words; put the display text in brackets and quote it when it holds `:`, `(`, `[`, `|`, `/`.
 
-Styling: `classDef new stroke:#2e7d32,stroke-width:2px` then `class Foo,Bar new`.
+Styling: `classDef` then `class`, with the classes in [`diagrams.md`](diagrams.md).
 
-## Sequence: ground-level flows, before-and-after
+## Sequence: flow before and after
 
 ```mermaid
 sequenceDiagram
@@ -90,7 +90,7 @@ sequenceDiagram
 
 Notes: `Note right of S: text`, `Note over A,B: text`.
 
-## Class: data shapes, data types changed
+## Class: data types changed
 
 ```mermaid
 classDiagram
@@ -118,9 +118,9 @@ Fields are `<visibility><name>: <Type>`; a member with `()` renders as a method.
 | `..>` | depends on |
 | `..\|>` | implements |
 
-Cardinality in quotes on either side: `Order "1" --> "1..*" Line`. Values: `1`, `0..1`, `*`, `1..*`, `n..m`. Styling as in flowchart: `classDef` then `class Order changed`.
+Cardinality in quotes on either side: `Order "1" --> "1..*" Line`. Values: `1`, `0..1`, `*`, `1..*`, `n..m`. Styling as in flowchart: `class Order changed`.
 
-## ER: schema changes
+## ER: data types changed, for a schema
 
 ```mermaid
 erDiagram
@@ -146,22 +146,3 @@ erDiagram
 | `o\|` | `o{` | zero or one to zero or many |
 
 Attribute line: `<type> <name> [PK|FK|UK] ["comment"]`.
-
-## State: lifecycles
-
-```mermaid
-stateDiagram-v2
-  [*] --> Pending
-  Pending --> Confirmed : payment_received
-  Pending --> Cancelled : timeout
-  Confirmed --> Shipped : packed
-  Shipped --> [*]
-  Cancelled --> [*]
-
-  state Confirmed {
-    [*] --> Reserved
-    Reserved --> Packed : pick
-  }
-```
-
-`[*]` is start and end. `A --> B : guard` puts the guard on the transition. `state Name { … }` nests, one level at most.

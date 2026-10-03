@@ -3,9 +3,9 @@
 
     python scripts/self_check.py docs/blueprints/<slug>/BLUEPRINT.html
 
-Checks the accessible-SVG contract on every figure and the single-file rules
+Checks the accessible-SVG contract on every figure, the single-file rules
 (no remote assets beyond the Google Fonts stylesheet, no executable attributes,
-no <script> at all). Ported from cathrynlavery/diagram-design (MIT); the
+no <script> at all), and that no template placeholder is left. Ported from cathrynlavery/diagram-design (MIT); the
 motion checks are gone because a blueprint is static.
 """
 
@@ -14,24 +14,23 @@ from __future__ import annotations
 import argparse
 import re
 import sys
-from collections import Counter
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urlparse
 
-ASCII_DECIMAL_RE = re.compile(r"^[0-9]+$")
+# Bracketed placeholders from references/template.html, matched case-insensitively.
+PLACEHOLDER_RE = re.compile(
+    r"\[(?:feature(?: name)?|short commit sha|entry|exit|one sentence:[^\]]*"
+    r"|question(?: the grilling asked)?|choice|alternatives|reason, one or two sentences"
+    r"|step|flow name|name|shape|one line[^\]]*|paths|behavior|term|sha|date)\]",
+    re.IGNORECASE,
+)
 REFERENCE_ATTRS = {"src", "href", "xlink:href", "poster", "srcset", "action", "formaction"}
 
 
 class DiagramParser(HTMLParser):
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
-        self.roots: list[dict[str, str]] = []
-        self.items: list[dict[str, str]] = []
-        self.actions: set[str] = set()
-        self.controls = 0
-        self.statuses: list[dict[str, str]] = []
-        self.statuses_in_controls = 0
         self.scripts: list[dict[str, object]] = []
         self.styles: list[str] = []
         self.svgs: list[dict[str, object]] = []
@@ -42,9 +41,6 @@ class DiagramParser(HTMLParser):
         self._capture: str | None = None
         self._current_script: dict[str, object] | None = None
         self._in_style = False
-        self._element_stack: list[str] = []
-        self._motion_root_depth: int | None = None
-        self._controls_depth: int | None = None
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         tag = tag.casefold()
@@ -59,23 +55,6 @@ class DiagramParser(HTMLParser):
                 self.unsafe.append(f"srcdoc attribute on <{tag}>")
             if key in REFERENCE_ATTRS:
                 self.references.append((tag, data.get("rel", ""), value))
-        if "data-motion-root" in data:
-            self.roots.append(data)
-            if self._motion_root_depth is None:
-                self._motion_root_depth = len(self._element_stack)
-        if self._motion_root_depth is not None:
-            if "data-motion-item" in data:
-                self.items.append(data)
-            if "data-motion-action" in data:
-                self.actions.add(data["data-motion-action"])
-            if "data-motion-controls" in data:
-                self.controls += 1
-                if self._controls_depth is None:
-                    self._controls_depth = len(self._element_stack)
-            if "data-motion-status" in data:
-                self.statuses.append(data)
-                if self._controls_depth is not None:
-                    self.statuses_in_controls += 1
         if tag == "script":
             self._current_script = {
                 "attrs": data,
@@ -86,7 +65,6 @@ class DiagramParser(HTMLParser):
             self.scripts.append(self._current_script)
         if tag == "style":
             self._in_style = True
-        self._element_stack.append(tag)
         if tag == "svg" and self._svg_depth == 0:
             self._svg_depth = 1
             self._current_svg = {"attrs": data, "first": None, "title": {}, "desc": {}}
@@ -114,20 +92,6 @@ class DiagramParser(HTMLParser):
             self._svg_depth -= 1
             if self._svg_depth == 0:
                 self._current_svg = None
-        for index in range(len(self._element_stack) - 1, -1, -1):
-            if self._element_stack[index] == tag:
-                del self._element_stack[index:]
-                break
-        if (
-            self._motion_root_depth is not None
-            and len(self._element_stack) <= self._motion_root_depth
-        ):
-            self._motion_root_depth = None
-        if (
-            self._controls_depth is not None
-            and len(self._element_stack) <= self._controls_depth
-        ):
-            self._controls_depth = None
 
     def handle_data(self, data: str) -> None:
         if self._current_script is not None:
@@ -226,6 +190,12 @@ def check_scripts(parser: DiagramParser, errors: list[str]) -> None:
 
 
 
+def check_placeholders(source: str, errors: list[str]) -> None:
+    left = sorted({match.group(0) for match in PLACEHOLDER_RE.finditer(source)})
+    if left:
+        errors.append(f"template placeholders left: {', '.join(left)}")
+
+
 def verify(path: Path) -> list[str]:
     source = path.read_text(encoding="utf-8")
     parser = parsed_document(source)
@@ -237,6 +207,7 @@ def verify(path: Path) -> list[str]:
             errors.append(finding)
     check_svgs(parser, errors)
     check_scripts(parser, errors)
+    check_placeholders(source, errors)
     return errors
 
 

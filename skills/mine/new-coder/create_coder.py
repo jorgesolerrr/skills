@@ -40,6 +40,8 @@ CONTRACT_URL = "ws://127.0.0.1:8080/ws"
 MODEL = "anthropic:claude-sonnet-5"
 #: The coder's .env values the new instance reuses.
 SHARED_SECRETS = ("GH_TOKEN", "CLAUDE_CODE_OAUTH_TOKEN")
+#: Every .env value the script reads.
+REQUIRED_ENV = (*SHARED_SECRETS, "ANTHROPIC_API_KEY", "GIT_USER_NAME", "GIT_USER_EMAIL")
 WORKSPACE_SKILLS = 'skills = [".claude/skills"]'
 
 
@@ -68,6 +70,9 @@ def main() -> int:
 
 async def create(args: argparse.Namespace, *, owner: str, repo: str) -> None:
     coder = read_env(HUB / "coder" / ".env")
+    missing = [name for name in REQUIRED_ENV if not coder.get(name)]
+    if missing:
+        raise Failed(f"/hub/coder/.env lacks {', '.join(missing)}; nothing was created")
     webhook_secret = secrets.token_hex(32)
     token = AccessToken((HUB / "access-token").read_text(encoding="utf-8").strip())
     async with contract_client(CONTRACT_URL, token) as client:
@@ -100,8 +105,8 @@ async def create(args: argparse.Namespace, *, owner: str, repo: str) -> None:
         )
         created = checked(await client.call(INSTANCE_CREATE, command))
         instance_id = created.instance_id
-        await followed(client, created.operation_id, "creation")
         print(f"instance: {instance_id}", flush=True)
+        await followed(client, created.operation_id, "creation")
 
         directory = HUB / "instances" / str(instance_id)
         set_checks(directory / "package.yaml", args.check)

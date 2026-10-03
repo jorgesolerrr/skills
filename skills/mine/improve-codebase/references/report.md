@@ -7,7 +7,7 @@ The architectural review is written inline in the reply as Markdown. Mermaid fen
 ```markdown
 # Architecture review for {{repo name}}
 
-Legend: box = module, dashed edge = seam, `leak` edge = leakage, thick box = deep module.
+Legend: box = module, red `leak` edge = leakage, thick box = deep module, faded box = internal to a deep module.
 
 ## Candidates
 
@@ -20,7 +20,7 @@ Legend: box = module, dashed edge = seam, `leak` edge = leakage, thick box = dee
 
 ## Header
 
-Repo name, date, and a compact legend on one line. No introduction paragraph. Straight into the candidates.
+Repo name and a compact legend on one line. No introduction paragraph. Straight into the candidates.
 
 ## Candidate card
 
@@ -45,17 +45,15 @@ Pick the pattern that fits the candidate. Mix them. Don't make every diagram loo
 
 ### Mermaid flowchart (the workhorse for dependencies / call flow)
 
-Use a `flowchart` when the point is "X calls Y calls Z, and look at the mess." Style with `classDef` to mark leakage edges and the deep module. Sequence diagrams work well for "before: 6 round-trips; after: 1."
+Use a `flowchart` when the point is "X calls Y calls Z, and look at the mess." Draw leakage as a solid `-- leak -->` edge and colour it with `linkStyle <n>` (edges count from 0 in the order written); mark the deep module with `class <id> deep`. Sequence diagrams work well for "before: 6 round-trips; after: 1."
 
 ````markdown
 ```mermaid
 flowchart LR
   A[OrderHandler] --> B[OrderValidator]
   B --> C[OrderRepo]
-  C -. leak .-> D[PricingClient]
-  classDef leak stroke:#dc2626,stroke-width:2px
-  classDef deep stroke:#0f172a,stroke-width:4px
-  class C,D leak
+  C -- leak --> D[PricingClient]
+  linkStyle 2 stroke:#dc2626,stroke-width:2px
 ```
 Figure: pricing leaks across the repo seam.
 ````
@@ -72,7 +70,9 @@ flowchart LR
     direction TB
     v[validate] --> p[price] --> s[store]
   end
+  classDef deep stroke:#0f172a,stroke-width:4px
   classDef faded stroke:#94a3b8,color:#94a3b8
+  class OI deep
   class v,p,s faded
 ```
 Figure: one interface, three now-internal calls.
@@ -96,11 +96,9 @@ One short section. Candidate name, one sentence on why, a link to its heading. T
 
 ## Tone
 
-Plain English, concise, but the architectural nouns and verbs come straight from the `/codebase-design` skill. Concision is not an excuse to drift.
+Plain English, concise, with the architectural nouns and verbs taken straight from the `/codebase-design` glossary, every time the concept comes up: module, interface, implementation, depth, deep, shallow, seam, adapter, leverage, locality. A unit of code is a *module*, what its callers see is its *interface*, where behaviour can be swapped is a *seam*.
 
-**Use exactly:** module, interface, implementation, depth, deep, shallow, seam, adapter, leverage, locality.
-
-**Never substitute:** component, service, unit (for module) · API, signature (for interface) · boundary (for seam) · layer, wrapper (for module, when you mean module).
+Domain things take their `CONTEXT.md` names: when `CONTEXT.md` defines "Order", write "the Order intake module", naming the concept rather than the class.
 
 **Phrasings that fit the style:**
 

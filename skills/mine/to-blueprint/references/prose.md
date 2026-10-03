@@ -4,8 +4,10 @@ Condensed from the `technical-writing` skill for the sections a blueprint has. A
 
 ## One mode per section
 
-- **Explanation** sections (At a glance, Problem, Solution, Decision log) carry the why. A view is allowed: say what you make of a trade-off, not just the two sides.
-- **Reference** sections (everything else) describe. No instruction, no persuasion, no hedging. Complete and dry.
+The template marks each section's mode.
+
+- **Explanation** sections carry the why. A view is allowed: say what you make of a trade-off, not just the two sides.
+- **Reference** sections describe. No instruction, no persuasion, no hedging. Complete and dry.
 
 ## Sentences
 

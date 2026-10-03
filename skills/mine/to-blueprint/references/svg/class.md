@@ -2,8 +2,6 @@
 
 Answers: what fields does this type carry, and what does it hold or point to?
 
-Every type the feature adds or changes is a box here. Fields are drawn, never pasted from the code.
-
 ## Layout
 
 - Each type is one box `rx="6"`, 200 wide, height by content. Hairlines split it into compartments: name, then fields, then operations. A compartment with nothing in it is omitted.

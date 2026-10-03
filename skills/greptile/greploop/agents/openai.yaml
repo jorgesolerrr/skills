@@ -1,0 +1,5 @@
+interface:
+  display_name: "Greploop"
+  short_description: "Loop a PR through Greptile review until 5/5 confidence with zero unresolved comments"
+policy:
+  allow_implicit_invocation: false

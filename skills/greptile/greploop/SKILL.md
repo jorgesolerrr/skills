@@ -1,10 +1,7 @@
 ---
 name: greploop
-description: >
-  Iteratively improves a GitHub pull request until Greptile gives it a 5/5 confidence score with
-  zero unresolved comments. Triggers Greptile review, fixes all actionable comments, pushes,
-  re-triggers review, and repeats. Use when the user wants to fully optimize a PR against
-  Greptile's code review standards.
+description: Loop a PR through Greptile review until 5/5 confidence with zero unresolved comments.
+disable-model-invocation: true
 license: MIT
 compatibility: Requires git and gh (GitHub CLI) authenticated, and Greptile installed on the repo.
 metadata:
@@ -26,7 +23,7 @@ Iteratively fix a PR until Greptile gives a perfect review: 5/5 confidence, zero
 ### 1. Identify the PR
 
 ```bash
-gh pr view --json number,headRefName -q '{number: .number, branch: .headRefName}'
+gh pr view --json number,headRefName,headRefOid
 ```
 
 Switch to the PR branch if not already on it.
@@ -45,16 +42,10 @@ Push the latest changes (if any):
 git push
 ```
 
-Wait for checks to start after push:
-
-```bash
-sleep 5
-```
-
 Check if Greptile is already running before posting a new trigger comment:
 
 ```bash
-GREPTILE_STATE=$(gh pr checks <PR_NUMBER> --json name,state | jq -r '.[] | select(.name | test("greptile"; "i")) | .state')
+GREPTILE_STATE=$(gh pr checks <PR_NUMBER> --json name,state --jq '.[] | select(.name | test("greptile"; "i")) | .state')
 ```
 
 If Greptile is **not** already running (`PENDING` or `IN_PROGRESS`), request a fresh review:
@@ -65,7 +56,7 @@ if [ "$GREPTILE_STATE" != "PENDING" ] && [ "$GREPTILE_STATE" != "IN_PROGRESS" ];
 fi
 ```
 
-Then poll for the Greptile check run to complete:
+Then poll for the Greptile check run to complete. The loop runs up to 10 minutes, so run this block with a 600000 ms timeout (or in the background):
 
 ```bash
 HEAD_SHA=$(gh pr view <PR_NUMBER> --json headRefOid -q .headRefOid)
@@ -81,7 +72,7 @@ while true; do
   fi
 
   GREPTILE_CHECK=$(gh api "repos/{owner}/{repo}/commits/$HEAD_SHA/check-runs" \
-    --jq '.check_runs[] | select(.name | test("greptile"; "i"))' 2>/dev/null)
+    --jq '.check_runs[] | select(.name | test("greptile"; "i")) | "\(.status // "completed") \(.conclusion // "pending")"' 2>/dev/null)
 
   if [ -z "$GREPTILE_CHECK" ]; then
     echo "Waiting for Greptile check to appear..."
@@ -89,8 +80,7 @@ while true; do
     continue
   fi
 
-  STATUS=$(echo "$GREPTILE_CHECK" | jq -r '.status // "completed"')
-  CONCLUSION=$(echo "$GREPTILE_CHECK" | jq -r '.conclusion // "pending"')
+  read -r STATUS CONCLUSION <<< "$GREPTILE_CHECK"
 
   if [ "$STATUS" = "completed" ]; then
     if [ "$CONCLUSION" = "success" ]; then
@@ -135,15 +125,32 @@ Parse the text for:
 - **Confidence score**: a pattern like `3/5` or `5/5` (or `Confidence: 3/5`).
 - **Comment count**: Number of inline review comments noted in the summary.
 
-Use whichever source has the **most recently updated** score. Prefer `updated_at` from issue comments when comparing an edited Greptile summary against older review entries.
-
-Also fetch all unresolved inline comments:
-
+**4. Unresolved review threads** (`gh` fills `{owner}` and `{repo}`; see [GraphQL reference](references/graphql-queries.md)):
 ```bash
-gh api repos/{owner}/{repo}/pulls/<PR_NUMBER>/comments
+gh api graphql --paginate -F owner='{owner}' -F repo='{repo}' -F pr=<PR_NUMBER> -f query='
+query($owner: String!, $repo: String!, $pr: Int!, $endCursor: String) {
+  repository(owner: $owner, name: $repo) {
+    pullRequest(number: $pr) {
+      reviewThreads(first: 100, after: $endCursor) {
+        pageInfo { hasNextPage endCursor }
+        nodes {
+          id
+          isResolved
+          comments(first: 1) {
+            nodes { body path author { login } }
+          }
+        }
+      }
+    }
+  }
+}' --jq '.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false)'
 ```
 
-Also carry forward actionable items from the latest Greptile general PR comment, especially the "Prompt to fix all with AI" section, even if the inline comment endpoint returns zero unresolved comments.
+The unresolved comment count is the number of threads this returns.
+
+Use whichever source has the **most recently updated** score. Prefer `updated_at` from issue comments when comparing an edited Greptile summary against older review entries.
+
+Also carry forward actionable items from the latest Greptile general PR comment, especially the "Prompt to fix all with AI" section, even if the thread query in B.4 returns zero unresolved threads.
 
 #### C. Check exit conditions
 
@@ -163,29 +170,7 @@ For each unresolved Greptile comment:
 
 #### E. Resolve threads
 
-Fetch unresolved review threads and resolve all that have been addressed (see [GraphQL reference](references/graphql-queries.md)):
-
-```bash
-gh api graphql -f query='
-query($cursor: String) {
-  repository(owner: "OWNER", name: "REPO") {
-    pullRequest(number: PR_NUMBER) {
-      reviewThreads(first: 100, after: $cursor) {
-        pageInfo { hasNextPage endCursor }
-        nodes {
-          id
-          isResolved
-          comments(first: 1) {
-            nodes { body path author { login } }
-          }
-        }
-      }
-    }
-  }
-}'
-```
-
-Resolve addressed threads:
+Resolve every thread handled in D (fixed, informational, or false positive), using the thread IDs from B.4:
 
 ```bash
 gh api graphql -f query='
@@ -197,16 +182,12 @@ mutation {
 
 #### F. Commit and push
 
+If `git status --porcelain` is empty after D, exit the loop and report the remaining comments as informational. Otherwise stage only the files you edited:
+
 ```bash
-git add -A
+git add <files you edited>
 git commit -m "address greptile review feedback (greploop iteration N)"
 git push
-```
-
-Wait for checks to start after push:
-
-```bash
-sleep 5
 ```
 
 Then go back to step **A**.
