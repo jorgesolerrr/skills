@@ -75,6 +75,8 @@ Local changes to the forks:
 - `grill-with-docs` is model-invocable, so a plain "grill this with docs" reaches it.
 - `to-tickets` treats file overlap as a blocking edge: two tickets that will edit the same area are serialized,
   so parallel agents don't produce conflicting PRs.
+- `to-tickets` links each ticket to its parent issue as a native sub-issue, not only through the `## Parent`
+  text, so tooling that groups tickets by parent (the kinby coder's stacks) sees them.
 - `triage` takes `--since #N` (batch-triage every untriaged issue from N up, one recommendation table, one
   approval) and writes briefs and triage notes into the issue description instead of new comments.
 - `code-review`, `improve-codebase-architecture` and `grill-me` were dropped: `adversarial-review`,

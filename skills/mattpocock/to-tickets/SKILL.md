@@ -64,9 +64,11 @@ Publish the approved tickets. **How** depends on the tracker `/setup-matt-pocock
 - **Local files** → write one file per ticket under `.scratch/<feature-slug>/issues/<NN>-<slug>.md`, numbered from `01` in dependency order (blockers first). Each file's "Blocked by" lists the numbers/titles it depends on. Use the per-ticket file template below: one ticket per file, never a single combined file.
 - **A real issue tracker (GitHub, Linear, …)** → publish one issue per ticket in dependency order (blockers first) so each ticket's blocking edges can reference real identifiers. Wire each edge with the Blocking operation in `docs/agents/issue-tracker.md` (the platform's native blocking where it has one), and also fill each ticket's `## Blocked by` section, giving the shared-area reason for every file-overlap edge. Apply the `ready-for-agent` triage label unless instructed otherwise; the tickets are agent-grabbable by construction.
 
+  When the source is a parent issue on the tracker (a spec, a PRD), link every ticket to it as a native child: on GitHub, a sub-issue (`gh api --method POST repos/<owner>/<repo>/issues/<parent>/sub_issues -F sub_issue_id=<child-db-id>`, where `<child-db-id>` is `gh api repos/<owner>/<repo>/issues/<child> --jq .id`, not the `#number`). The `## Parent` section is for readers; the native link is what tooling reads. A ticket without it counts as top-level, so an agent working the tickets won't group them under the parent or stack their PRs. Link each ticket before it gets the `ready-for-agent` label, because an agent can pick up a labeled ticket within seconds. Check the parent's sub-issue count matches the number of tickets before reporting.
+
 Tell the user the **frontier** (the tickets with no open blockers) as the place to start. For a purely linear chain that is the first ticket.
 
-Do NOT close or modify any parent issue.
+Do NOT close or edit any parent issue; linking tickets to it as sub-issues is the only change it gets.
 
 <local-ticket-template>
 
