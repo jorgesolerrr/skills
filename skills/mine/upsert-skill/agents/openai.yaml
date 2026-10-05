@@ -1,0 +1,3 @@
+interface:
+  display_name: "Upsert Skill"
+  short_description: "Add or update skills in the registry, then sync the links"

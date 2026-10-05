@@ -4,10 +4,10 @@ Issues and specs for this repo live as GitLab issues. Use the [`glab`](https://g
 
 ## Conventions
 
-- **Create an issue**: `glab issue create --title "..." --description "..."`. Use a heredoc for multi-line descriptions. Pass `--description -` to open an editor.
+- **Create an issue**: `glab issue create --title "..." --description "..."`. For multi-line descriptions, write them to a scratchpad file with the Write tool and pass `--description "$(cat <path>)"`. Pass `--description -` to open an editor.
 - **Read an issue**: `glab issue view <number> --comments`. Use `-F json` for machine-readable output.
 - **List issues**: `glab issue list -F json` with appropriate `--label` filters.
-- **Edit an issue description**: read the current description from `glab issue view <number> -F json`, edit it, then `glab issue update <number> --description "..."` (a heredoc for multi-line text).
+- **Edit an issue description**: read the current description from `glab issue view <number> -F json`, edit it, then `glab issue update <number> --description "$(cat <path>)"`, with the text written to a scratchpad file by the Write tool.
 - **Comment on an issue**: `glab issue note <number> --message "..."`. GitLab calls comments "notes".
 - **Apply / remove labels**: `glab issue update <number> --label "..."` / `--unlabel "..."`. Multiple labels can be comma-separated or by repeating the flag.
 - **Close**: `glab issue close <number>`. `glab issue close` does not accept a closing comment, so post the explanation first with `glab issue note <number> --message "..."`, then close.

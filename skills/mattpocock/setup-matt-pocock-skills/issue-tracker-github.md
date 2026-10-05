@@ -4,7 +4,7 @@ Issues and specs for this repo live as GitHub issues. Use the `gh` CLI for all o
 
 ## Conventions
 
-- **Create an issue**: `gh issue create --title "..." --body "..."`. Use a heredoc for multi-line bodies.
+- **Create an issue**: `gh issue create --title "..." --body "..."`. Write multi-line bodies to a scratchpad file with the Write tool, then pass `--body-file <path>` (`gh issue create`, `gh issue comment`, `gh issue edit` and `gh pr create` all take it).
 - **Read an issue**: `gh issue view <number> --json number,title,body,labels,author,comments,createdAt`.
 - **List issues**: `gh issue list --state open --json number,title,body,labels,comments --jq '[.[] | {number, title, body, labels: [.labels[].name], comments: [.comments[].body]}]'` with appropriate `--label` and `--state` filters.
 - **Edit an issue description**: `gh issue view <number> --json body --jq .body > body.md`, edit `body.md`, then `gh issue edit <number> --body-file body.md`.

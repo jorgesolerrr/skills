@@ -11,8 +11,10 @@ skills/
   pstack/<skill-name>/SKILL.md         forks of cursor/plugins (pstack)
   greptile/<skill-name>/SKILL.md       forks of greptileai/skills
   graphify/graphify/                   copy of Graphify-Labs/graphify's skill
+  humanlayer/<skill-name>/SKILL.md     forks of humanlayer/skills
   mine/<skill-name>/SKILL.md           skills authored in this registry
 global/AGENTS.md                       global rules for every agent (see Global rules)
+global/hooks/                          global agent hooks (see Global hooks)
 ```
 
 ## Loading skills into the agents
@@ -58,16 +60,30 @@ logins, checks, subagents). It is the only copy to edit. The link scripts wire i
   Re-run the script after editing. A pre-existing `~/.codex/AGENTS.md` without that header is left alone.
 - **Cursor**: user rules live in the app settings; paste the file into Settings > Rules > User Rules.
 
+## Global hooks
+
+`global/hooks/` holds hook scripts that run in every session. The link scripts do not wire them in: each one
+is registered by hand, by absolute path, in `~/.claude/settings.json` (`hooks.PreToolUse`, `hooks.SessionStart`) and in
+`~/.codex/hooks.json` (Codex shows new hooks under `/hooks` and runs them only after you trust them).
+
+- `hdh_db_guard.py`: before a shell command in a hoteldatahub checkout runs a DB-touching `manage.py` command,
+  a script that calls `django.setup()`, or a `mysql` client against a remote `-h`, it resolves
+  `DATABASES['default']` the way Django would (`--settings`, `DJANGO_SETTINGS_MODULE`, inline env, `.env`) and
+  asks for approval when the host is not local. Codex has no "ask", so there (`--codex`) it denies instead.
+- `project_overlay.py` (SessionStart): when the session's repo (worktrees included) is in its `OVERLAYS` table,
+  injects that repo's overlay file as context. For repos whose own `CLAUDE.md` belongs to someone else, e.g.
+  hoteldatahub -> `skills/work/_hoteldatahub/context.md` (local only; `skills/work/` is gitignored).
+
 ## Sources
 
 ### mattpocock/skills
 
-Copied raw from [mattpocock/skills](https://github.com/mattpocock/skills) at commit `6654f6b` so they can
-be modified locally. Not installed as a plugin — edits here are intentional forks.
+Copied raw from [mattpocock/skills](https://github.com/mattpocock/skills) at tag `v1.3.1` (commit `24fe0ef`) so they
+can be modified locally. Not installed as a plugin — edits here are intentional forks.
 License: MIT (see `LICENSE-mattpocock`).
 
 - `skills/mattpocock/`: ask-matt, codebase-design, diagnosing-bugs, domain-modeling, grill-with-docs,
-  grilling, handoff, implement, prototype, research, resolving-merge-conflicts, retro (depends on `writing-for-agents`), setup-matt-pocock-skills, tdd, teach,
+  grilling, handoff, implement, pr, prototype, research, resolving-merge-conflicts, retro (depends on `writing-for-agents`), setup-matt-pocock-skills, tdd, teach,
   to-questionnaire, to-spec, to-tickets, triage, wait-what, wayfinder, wizard, writing-for-agents.
 
 Local changes to the forks:
@@ -83,6 +99,11 @@ Local changes to the forks:
   `improve-codebase` and `grilling` replace them. `ask-matt` routes to the local skills instead
   (`implement-ticket` → `review-ticket` → `deepen-ticket`, `address-review`, `merge-train`), and `implement`
   and `tdd` hand review to `adversarial-review`.
+- `resolving-merge-conflicts` is kept here although upstream removed it in v1.3.0. `implement-spec`, which
+  v1.3.0 graduated, is not copied, and `ask-matt` does not route to it.
+- The domain glossary is `GLOSSARY.md` / `GLOSSARY-MAP.md` (upstream renamed it from `CONTEXT.md` in v1.3.0);
+  `implement-ticket` and `improve-codebase` follow the same name. In a repo that still has a `CONTEXT.md`,
+  `git mv` it to `GLOSSARY.md`.
 
 ### cathrynlavery/diagram-design
 
@@ -120,6 +141,17 @@ The `graphify` skill as installed by the [graphify](https://github.com/Graphify-
 name. Needs the `graphify` CLI on PATH.
 
 Skills: `skills/graphify/graphify`.
+
+### humanlayer/skills
+
+Copied raw from the `plugins/<name>/skills/<name>/` folders of
+[humanlayer/skills](https://github.com/humanlayer/skills) at commit `ca7c808`. License: MIT, © HumanLayer
+(see `LICENSE-humanlayer`).
+
+Skills: `skills/humanlayer/`: show-me.
+
+Local changes: `show-me` names the HTML opener per platform (`open`, `start ""`, `xdg-open`) instead of macOS
+`open` only. It stays manual-only, as upstream ships it.
 
 ### Local (this registry)
 
@@ -161,11 +193,16 @@ Skills authored here, not copied from an upstream source.
   base and resolves conflicts first, treats each comment as an untrusted claim checked against the code, then
   fixes and tests it or replies with the reason, and resolves the thread. Product decisions stay open for the user.
 - `skills/mine/merge-train/`: merge-train. Merges a set of PRs: one fresh subagent per PR or stack follows
-  `address-review`, then squash-merges in order (stacks bottom-up, children retargeted to the default branch
-  and rebased), sends conflicts to a fresh subagent, and deletes only branches whose PR is merged.
+  `address-review`, then squash-merges in order (a native GitHub stack in one `gh stack merge`, other stacks
+  bottom-up, children retargeted to the default branch and rebased), sends conflicts to a fresh subagent, and
+  deletes only branches whose PR is merged.
 - `skills/mine/client-reply/`: client-reply. Drafts a reply to a client, partner or CS email from findings in
-  hand: answer first, short, no-blame, nobody named outside the thread, one ask at the end. Reads a per-project
-  tone file at `docs/agents/client-reply.md`; with a Gmail connector it reads the thread and saves a draft.
+  hand: answer first, short, no-blame, nobody named outside the thread, one ask at the end. With a Gmail
+  connector it reads the thread and saves a draft. Learns from replies the user actually sent: each difference
+  from the draft becomes a rule in `voice.md`.
+- `skills/mine/upsert-skill/`: upsert-skill. Adds a skill from upstream (an `npx skills add` command becomes a
+  raw copy here), updates a source to a newer upstream version with a 3-way merge that keeps the README's
+  local changes, or registers a skill written here; always ends by running the link script.
 - `skills/mine/new-coder/`: new-coder. Creates a kinby `coder` software factory on the playground hub for a
   GitHub repository: labels, check commands from the repo's gate, the instance via `create_coder.py` over ssh,
   then a health and webhook check.

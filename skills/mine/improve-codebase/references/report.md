@@ -98,7 +98,7 @@ One short section. Candidate name, one sentence on why, a link to its heading. T
 
 Plain English, concise, with the architectural nouns and verbs taken straight from the `/codebase-design` glossary, every time the concept comes up: module, interface, implementation, depth, deep, shallow, seam, adapter, leverage, locality. A unit of code is a *module*, what its callers see is its *interface*, where behaviour can be swapped is a *seam*.
 
-Domain things take their `CONTEXT.md` names: when `CONTEXT.md` defines "Order", write "the Order intake module", naming the concept rather than the class.
+Domain things take their `GLOSSARY.md` names: when `GLOSSARY.md` defines "Order", write "the Order intake module", naming the concept rather than the class.
 
 **Phrasings that fit the style:**
 

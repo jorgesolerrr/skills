@@ -1,6 +1,6 @@
 ---
 name: merge-train
-description: "Merge a set of PRs: address each PR's review in a fresh subagent, squash-merge stacks bottom-up with children retargeted to the default branch, hand conflicts to a fresh subagent, and delete only branches of merged PRs."
+description: "Merge a set of PRs: address each PR's review in a fresh subagent, squash-merge a native GitHub stack in one `gh stack merge` and other stacks bottom-up with children retargeted to the default branch, hand conflicts to a fresh subagent, and delete only branches of merged PRs."
 disable-model-invocation: true
 ---
 
@@ -16,7 +16,9 @@ List the PRs with `gh pr list --state open --limit 200 --json number,title,headR
 
 Build the **stacks**: a PR whose base is another PR's head branch is that PR's child. Order the train with each stack as a unit, parent before child, and stacks and lone PRs by number.
 
-Show the user the ordered train (stacks drawn as `#12 → #13 → #14`) and wait for their go. This is the only gate.
+For each stack, check whether GitHub tracks it as a **native stack**: `gh api repos/<owner>/<repo>/pulls/<n> --jq .stack` returns `{number, position, size, base}` on every PR of one, and `null` otherwise. A native stack merges in one step (3a); any other stack merges PR by PR (3b).
+
+Show the user the ordered train (stacks drawn as `#12 → #13 → #14`, each marked native or not) and wait for their go. This is the only gate.
 
 Done when the user has approved the order.
 
@@ -32,6 +34,20 @@ Add `.worktrees/` to `.git/info/exclude` if it is not there. Then launch one fre
 Done when every subagent has reported. A PR with failing checks or open **decision** threads leaves the train, and takes every descendant in its stack with it: record why.
 
 ### 3. Merge in order
+
+Take the train's units in order: a native stack goes through 3a, and a lone PR or any other stack goes through 3b.
+
+#### 3a. A native stack
+
+The [`gh stack`](https://docs.github.com/en/pull-requests/reference/stacked-prs-cli-commands) extension (`gh extension install github/gh-stack`) merges the stack. If the extension is missing, merge the stack through 3b.
+
+1. Each PR from the bottom up to the top one still on the train: `gh pr checks <n>` exits 0, and its review threads are all resolved. If a PR fails, the top of the merge becomes the PR below it, and the failing PR and every PR above it are recorded as stopped.
+2. `gh stack merge <top-n> --squash --yes`. It merges every PR from the bottom up to `<top-n>` in one all-or-nothing operation, one squash commit per PR, bottom first, so nothing has to be retargeted or rebased. GitHub requires every PR in it to be approved where branch protection requires approval, its checks to be green, and the stack's history to be linear. If GitHub reports the history as not linear, run `gh stack rebase` from a worktree of the top branch, then `gh stack push`, and retry.
+3. Confirm that `gh pr view <n> --json state,mergeCommit` reads `MERGED` for every PR, and record each squash sha. The merge leaves the head branches on the remote, and step 4 deletes them.
+
+When the merge fails, no PR has merged. Record the stack as stopped with the output, or fall back to 3b if the error is about the stack itself rather than a PR's checks or reviews.
+
+#### 3b. PR by PR
 
 For each PR still on the train, in order:
 
@@ -50,7 +66,7 @@ Done when every PR on the train is merged or recorded as stopped with its reason
 
 ### 4. Clean up
 
-Delete a branch only when `gh pr list --state merged --head <branch>` returns its PR. For each such branch: remove its `.worktrees/pr-<n>` worktree, then the local branch, then the remote branch if `--delete-branch` left it. Leave every other branch and worktree as it was. Then check out the default branch and pull.
+Delete a branch only when `gh pr list --state merged --head <branch>` returns its PR. For each such branch: remove its `.worktrees/pr-<n>` worktree, then the local branch, then the remote branch if the merge left it (`gh stack merge` always does, and `--delete-branch` can). Leave every other branch and worktree as it was. Then check out the default branch and pull.
 
 Done when every deleted branch maps to a merged PR and `git worktree list` shows no `.worktrees/pr-<n>` worktree for a merged PR.
 
