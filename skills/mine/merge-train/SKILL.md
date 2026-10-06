@@ -31,7 +31,11 @@ Add `.worktrees/` to `.git/info/exclude` if it is not there. Then launch one fre
 - to work in a worktree per PR at `.worktrees/pr-<n>`;
 - to return: one line per thread (verdict and action), the final head sha of each PR, the check status, and any **decision** threads verbatim.
 
-Done when every subagent has reported. A PR with failing checks or open **decision** threads leaves the train, and takes every descendant in its stack with it: record why.
+A stack's prompt also tells its subagent to coordinate rather than address the threads itself, so its context stays small however tall the stack is. It walks the stack bottom first. A PR with no unresolved thread needs only its checks read. Every other PR gets its own fresh sub-subagent, which follows address-review for that one PR in its worktree and returns the same compact lines. Before a child's sub-subagent starts, the coordinator merges the child's fixed parent into it and pushes. Sub-subagents run in parallel only for children whose parent did not change.
+
+A background subagent can stop with an interim result ("waiting for the subagent") while it still owes work. That is not its report: resume it with SendMessage, tell it to finish the remaining PRs and to end only with the final report.
+
+Done when every subagent has sent its final report. A PR with failing checks or open **decision** threads leaves the train, and takes every descendant in its stack with it: record why.
 
 ### 3. Merge in order
 
@@ -68,7 +72,11 @@ Done when every PR on the train is merged or recorded as stopped with its reason
 
 Delete a branch only when `gh pr list --state merged --head <branch>` returns its PR. For each such branch: remove its `.worktrees/pr-<n>` worktree, then the local branch, then the remote branch if the merge left it (`gh stack merge` always does, and `--delete-branch` can). Leave every other branch and worktree as it was. Then check out the default branch and pull.
 
-Done when every deleted branch maps to a merged PR and `git worktree list` shows no `.worktrees/pr-<n>` worktree for a merged PR.
+Run the merge and the cleanup from the repo root, never from inside a worktree you are about to remove. On Windows, `git worktree remove --force` can deregister a worktree and still fail to delete its folder: `Directory not empty` (`node_modules`, `.venv`), or `Permission denied` while a shell sits inside it. Delete any such leftover `.worktrees/pr-<n>` folder of a merged PR, then run `git worktree prune`.
+
+When the pull is blocked by uncommitted changes in the main checkout, those changes are the user's. Leave them untouched: no stash, checkout or reset. Report that the default branch is behind and which files block the pull.
+
+Done when every deleted branch maps to a merged PR, and neither `git worktree list` nor the disk holds a `.worktrees/pr-<n>` of a merged PR.
 
 ### 5. Report
 

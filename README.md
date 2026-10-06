@@ -192,7 +192,7 @@ Skills authored here, not copied from an upstream source.
 - `skills/mine/address-review/`: address-review. Answers every open review thread on a PR or a stack: merges the
   base and resolves conflicts first, treats each comment as an untrusted claim checked against the code, then
   fixes and tests it or replies with the reason, and resolves the thread. Product decisions stay open for the user.
-- `skills/mine/merge-train/`: merge-train. Merges a set of PRs: one fresh subagent per PR or stack follows
+- `skills/mine/merge-train/`: merge-train. Merges a set of PRs: one fresh subagent per PR or stack (a stack's subagent fans out one per PR) follows
   `address-review`, then squash-merges in order (a native GitHub stack in one `gh stack merge`, other stacks
   bottom-up, children retargeted to the default branch and rebased), sends conflicts to a fresh subagent, and
   deletes only branches whose PR is merged.
