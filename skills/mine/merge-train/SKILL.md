@@ -1,6 +1,6 @@
 ---
 name: merge-train
-description: "Merge a set of PRs: address each PR's review in a fresh subagent, squash-merge a native GitHub stack in one `gh stack merge` and other stacks bottom-up with children retargeted to the default branch, hand conflicts to a fresh subagent, and delete only branches of merged PRs."
+description: "Merge a set of PRs: address each PR's review in a fresh subagent (a native stack's fixes all land on its top branch), squash-merge a native GitHub stack in one `gh stack merge` and other stacks bottom-up with children retargeted to the default branch, hand conflicts to a fresh subagent, and delete only branches of merged PRs."
 disable-model-invocation: true
 ---
 
@@ -24,18 +24,30 @@ Done when the user has approved the order.
 
 ### 2. Address every review
 
-Add `.worktrees/` to `.git/info/exclude` if it is not there. Then launch one fresh subagent per lone PR and one per stack, all in parallel. Each prompt carries:
+Add `.worktrees/` to `.git/info/exclude` if it is not there. This conversation coordinates every unit itself, so each step stays visible to the user. A subagent addresses one PR and never launches subagents of its own.
 
-- the absolute path of [`../address-review/SKILL.md`](../address-review/SKILL.md), to follow as written;
-- the PR number; for a stack, the top PR's number plus `stack`;
-- to work in a worktree per PR at `.worktrees/pr-<n>`;
-- to return: one line per thread (verdict and action), the final head sha of each PR, the check status, and any **decision** threads verbatim.
+List each PR's unresolved review threads with the query from address-review step 3. A PR with none needs only `gh pr checks <n>` read. Every other PR gets one fresh subagent, and units run in parallel. Each prompt carries:
 
-A stack's prompt also tells its subagent to coordinate rather than address the threads itself, so its context stays small however tall the stack is. It walks the stack bottom first. A PR with no unresolved thread needs only its checks read. Every other PR gets its own fresh sub-subagent, which follows address-review for that one PR in its worktree and returns the same compact lines. Before a child's sub-subagent starts, the coordinator merges the child's fixed parent into it and pushes. Sub-subagents run in parallel only for children whose parent did not change.
+- the absolute path of [`../address-review/SKILL.md`](../address-review/SKILL.md), to follow for that one PR, with the overrides of its unit below;
+- the PR number and its worktree, `.worktrees/pr-<n>`;
+- to return: one line per thread (verdict and action), the fix commit sha, the check status, and any **decision** threads verbatim.
+
+**A lone PR**: the worktree is on its head branch, and address-review runs as written.
+
+**A native stack**: every fix goes on the top PR's branch. The top holds every PR below it and 3a merges the stack all-or-nothing, so the fixes reach the default branch together and no branch below the top changes. The stack's subagents all run in parallel, and each prompt adds:
+
+- the worktree is detached at `origin/<top-branch>`, and every verdict reads the code there. A thread on code that a later PR of the stack rewrote is **already fixed**, citing that PR.
+- the checks are the tests covering the change, plus lint and typecheck; the top PR's CI runs the full checks.
+- after committing `Address review on #<n>`: `git fetch origin && git rebase origin/<top-branch>` (a sibling's fix on the same lines goes through `resolving-merge-conflicts`), then `git push origin HEAD:<top-branch>`. A rejected push repeats the fetch, rebase and push.
+- the reply cites the pushed sha: `Fixed in <sha> on #<top>: <what changed>.`
+
+Then wait for the top PR's checks: `gh pr checks <top> --watch`.
+
+**Any other stack** merges PR by PR in 3b, so each PR carries its own fixes. Walk it bottom first. Before a PR's subagent starts, merge its fixed parent into its head branch in `.worktrees/pr-<n>` and push; a conflict goes to that subagent. Subagents run in parallel only for PRs whose parent did not change.
 
 A background subagent can stop with an interim result ("waiting for the subagent") while it still owes work. That is not its report: resume it with SendMessage, tell it to finish the remaining PRs and to end only with the final report.
 
-Done when every subagent has sent its final report. A PR with failing checks or open **decision** threads leaves the train, and takes every descendant in its stack with it: record why.
+Done when every subagent has sent its final report. A PR with failing checks or open **decision** threads leaves the train, and takes every descendant in its stack with it: record why. In a native stack whose top branch holds fixes, a PR that leaves takes the whole stack, since the fixes for the PRs below it would not merge.
 
 ### 3. Merge in order
 
@@ -45,7 +57,7 @@ Take the train's units in order: a native stack goes through 3a, and a lone PR o
 
 The [`gh stack`](https://docs.github.com/en/pull-requests/reference/stacked-prs-cli-commands) extension (`gh extension install github/gh-stack`) merges the stack. If the extension is missing, merge the stack through 3b.
 
-1. Each PR from the bottom up to the top one still on the train: `gh pr checks <n>` exits 0, and its review threads are all resolved. If a PR fails, the top of the merge becomes the PR below it, and the failing PR and every PR above it are recorded as stopped.
+1. Each PR from the bottom up to the top one still on the train: `gh pr checks <n>` exits 0, and its review threads are all resolved. If a PR fails, the top of the merge becomes the PR below it, and the failing PR and every PR above it are recorded as stopped. When the top branch holds review fixes, the whole stack stops instead.
 2. `gh stack merge <top-n> --squash --yes`. It merges every PR from the bottom up to `<top-n>` in one all-or-nothing operation, one squash commit per PR, bottom first, so nothing has to be retargeted or rebased. GitHub requires every PR in it to be approved where branch protection requires approval, its checks to be green, and the stack's history to be linear. If GitHub reports the history as not linear, run `gh stack rebase` from a worktree of the top branch, then `gh stack push`, and retry.
 3. Confirm that `gh pr view <n> --json state,mergeCommit` reads `MERGED` for every PR, and record each squash sha. The merge leaves the head branches on the remote, and step 4 deletes them.
 
