@@ -12,7 +12,11 @@ skills/
   greptile/<skill-name>/SKILL.md       forks of greptileai/skills
   graphify/graphify/                   copy of Graphify-Labs/graphify's skill
   humanlayer/<skill-name>/SKILL.md     forks of humanlayer/skills
+  cursor/<skill-name>/SKILL.md         copies of cursor/plugins (cursor-team-kit, thermos), on trial
+  addyosmani/<skill-name>/SKILL.md     copies of addyosmani/agent-skills, on trial
+  ponytail/<skill-name>/SKILL.md       copies of DietrichGebert/ponytail, on trial
   mine/<skill-name>/SKILL.md           skills authored in this registry
+plugins/ponytail/                      hooks and manifests of DietrichGebert/ponytail, not linked, for study
 global/AGENTS.md                       global rules for every agent (see Global rules)
 global/hooks/                          global agent hooks (see Global hooks)
 ```
@@ -119,7 +123,13 @@ Skills: `skills/cathrynlavery/diagram-design`.
 Copied raw from the `pstack/skills/` folder of [cursor/plugins](https://github.com/cursor/plugins) at
 commit `4612556`. License: MIT, © Lauren Tan (see `LICENSE-cursor-pstack`).
 
-Skills: `skills/pstack/`: technical-writing, unslop.
+Skills: `skills/pstack/`: technical-writing, unslop, no-comments (copied later, at commit `ccb5507`, on trial).
+
+Local changes to `no-comments`: the `Comment Sicko` agent (`pstack/agents/comment-sicko.md`) is inlined as a
+`## Comment Sicko` section, and step 1 spawns a fresh general-purpose subagent with that section as its prompt,
+since the registry has no agent definitions. An `agents/openai.yaml` with `allow_implicit_invocation: false`
+keeps it manual-only in Codex. It still names pstack skills that are not copied: `how`, `why`, `architect`,
+`principle-fix-root-causes`, `principle-redesign-from-first-principles`.
 
 ### greptileai/skills
 
@@ -152,6 +162,54 @@ Skills: `skills/humanlayer/`: show-me.
 
 Local changes: `show-me` names the HTML opener per platform (`open`, `start ""`, `xdg-open`) instead of macOS
 `open` only. It stays manual-only, as upstream ships it.
+
+### cursor/plugins (cursor-team-kit, thermos)
+
+Copied raw from [cursor/plugins](https://github.com/cursor/plugins) at commit `ccb5507`: the
+`cursor-team-kit/skills/` and `thermos/skills/` folders. On trial, to compare against our own review skills.
+License: MIT, © Cursor (see `LICENSE-cursor`; both plugins ship the same file).
+
+Skills: `skills/cursor/`: thermo-nuclear-code-quality-review, thermo-nuclear-review.
+
+Local changes: an `agents/openai.yaml` with `allow_implicit_invocation: false`, so Codex also treats them as
+manual-only (upstream already sets `disable-model-invocation: true`).
+
+### addyosmani/agent-skills
+
+Copied raw from the `skills/` folder of [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills)
+at commit `1401c8b`. On trial, to compare against our own skills. License: MIT, © Addy Osmani
+(see `LICENSE-addyosmani`).
+
+Skills: `skills/addyosmani/`: api-and-interface-design, code-simplification.
+
+Local changes: both are manual-only (`disable-model-invocation: true`, and an `agents/openai.yaml` with
+`allow_implicit_invocation: false` for Codex). `api-and-interface-design` points to `deprecation-and-migration`,
+which is not copied.
+
+### DietrichGebert/ponytail
+
+Copied raw from [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) at commit `9cc65d0`
+(v5.1.0). On trial: each skill is run by hand, in sessions with and without it, to compare. License: MIT
+(see `LICENSE-ponytail`).
+
+Skills: `skills/ponytail/`: ponytail, ponytail-audit, ponytail-debt, ponytail-gain, ponytail-help, ponytail-review.
+
+The rest of the Claude Code plugin is kept for study in `plugins/ponytail/`, outside `skills/` so the link scripts
+skip it: `.claude-plugin/`, `.codex-plugin/plugin.json`, `hooks/` (hook manifest, Node hook scripts, statusline
+scripts, `copilot-hooks.json` because the tests read it), `tests/hooks*.test.js`, `scripts/uninstall.js` (with
+`scripts/cursor-hooks.js`, which it requires), `AGENTS.md`, `README.md` and `INSTALL.md`. Its hooks are not
+registered anywhere.
+
+Local changes:
+
+- The skills moved from the plugin's `skills/` folder to `skills/ponytail/`, so the plugin folder no longer holds
+  them: `claude --plugin-dir plugins/ponytail` loads hooks only, and the hooks fall back to their built-in copy of
+  the rules (`ponytail-instructions.js`).
+- All six are manual-only (`disable-model-invocation: true`, and an `agents/openai.yaml` with
+  `allow_implicit_invocation: false` for Codex). Upstream lets `ponytail` load on any coding task and
+  `ponytail-review` on any "review this".
+- Upstream's `tests/hooks.test.js` fails one assertion on Windows (#1032 statusline nudge path), in the upstream
+  clone too.
 
 ### Local (this registry)
 
