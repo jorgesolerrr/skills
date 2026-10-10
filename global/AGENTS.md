@@ -2,30 +2,6 @@
 
 Loaded in every session, in every repo. A project's own `AGENTS.md` or `CLAUDE.md` adds to these.
 
-## Language
-
-- Reply in the language of my last message.
-- Code, identifiers, commit messages, PR titles and PR bodies are in English, in every repo.
-
-## Dictation
-
-I dictate many prompts by voice, so names arrive garbled. Read them as:
-
-| Heard | Meant |
-|---|---|
-| "open a pr ready for review", "the DPR", "TBR" (standing for a PR) | PR |
-| "greeting session" | grilling session |
-| "season" | session |
-| "Group Tile", "Reptile" / "Rabbit" | Greptile / CodeRabbit |
-| "Cloud", "Cloud Fable" | Claude, Claude Fable |
-| "Sec", "PBSEC", "checkbacking" | CEC, PB-CEC, CEC-Backend |
-| "skin-by" | kinby |
-| "Fidetur", "Fijetu", "Fivetune" | Fideltour |
-| "Royback", "Roy Back", "rollback" naming an integration | Roiback |
-| "Senit" / "Safiro" | Zenit / Zafiro |
-
-"Fidelity" is also a real HDH integration. When a dictated prompt says Fidelity and the Fidelity integration is not what the work is about, ask whether I meant Fideltour before acting. Ask the same whenever a garbled name could be two real things.
-
 ## Browser
 
 Browser testing runs in Playwright's bundled Chromium with its own profile; keep sign-ins as saved storage state. My own Chrome stays untouched: end only the processes you started, by their PID, and use the Claude in Chrome tools only when I ask for them.

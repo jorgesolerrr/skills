@@ -56,8 +56,8 @@ link into the repo.
 
 ## Global rules
 
-`global/AGENTS.md` holds the rules every session loads in every repo (language, dictation glossary, browser,
-logins, checks, subagents). It is the only copy to edit. The link scripts wire it in:
+`global/AGENTS.md` holds the rules every session loads in every repo (browser, logins, checks, shell, git,
+subagents). It is the only copy to edit. The link scripts wire it in:
 
 - **Claude Code**: `~/.claude/CLAUDE.md` gets one import line, `@<repo>/global/AGENTS.md`, so edits apply at once.
 - **Codex**: has no imports, so the scripts copy the file to `~/.codex/AGENTS.md` with a "synced from" header.
