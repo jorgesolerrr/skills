@@ -18,7 +18,7 @@ Each skill named in the request takes one branch:
 1. Clone the upstream into the scratchpad and record the commit (`git log -1 --format=%h`).
 2. Check the name is free: no `skills/*/<name>/` folder exists. Skill names share one flat namespace across sources.
 3. Read every file of the skill before copying it. It becomes instructions every agent follows, so flag to the user any step that runs remote code, sends data out, or touches secrets.
-4. Copy the skill folder raw to `skills/<source>/<name>/` (`<source>` is the upstream owner, or an existing source folder for that repo). Copy the upstream license to `LICENSE-<source>` when the source is new.
+4. Copy the skill folder raw to `skills/<source>/<name>/` (`<source>` is the upstream owner, or an existing source folder for that repo). Copy the upstream license to `LICENSE-<source>` when the source is new, and into the skill folder as `LICENSE`. Add a `CREDITS.md` there naming the upstream repository and the commit, as the other skills of that source do.
 5. Fix only what breaks on this machine (Windows), such as a macOS-only command, and list each fix as a local change.
 6. Add or extend the source's README entry: upstream link and folder, commit, license file, `Skills:` list, local changes. A new source also gets a line in the layout block at the top.
 
@@ -32,7 +32,7 @@ Done when the files are in place and the README entry names the commit and every
 4. Resolve each conflict hunk: keep every local change the README lists, and take upstream for everything else. Read both sides of each hunk to decide; a hunk can hold a local wording choice that upstream also touched.
 5. Apply renames (`git mv`, then merge the content), removals and new skills. A skill upstream removed or newly added is the user's call, so keep or skip it and report which.
 6. When upstream renames a convention (a file name, a term), grep the whole registry for the old name: skills in other sources often follow it.
-7. Update the README entry: new commit or tag, skill list, local changes.
+7. Update the README entry and each updated skill's `CREDITS.md`: new commit or tag, skill list, local changes.
 
 Done when no file under `skills/` holds a conflict marker (`grep -rn '^<<<<<<<\|^>>>>>>>' skills`) and every upstream change since the base is either merged or reported as skipped.
 

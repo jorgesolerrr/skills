@@ -80,6 +80,11 @@ is registered by hand, by absolute path, in `~/.claude/settings.json` (`hooks.Pr
 
 ## Sources
 
+Every skill copied or started from another author's work holds two files in its own folder: `LICENSE`, the
+original's licence text, and `CREDITS.md`, which names the upstream repository and the commit copied. A tool
+that copies one skill folder elsewhere (the `skills` CLI, kinby's `skills:sync`) takes the notice with it. The
+`LICENSE-<source>` files at the root are the originals those copies are made from.
+
 ### mattpocock/skills
 
 Copied raw from [mattpocock/skills](https://github.com/mattpocock/skills) at tag `v1.3.1` (commit `24fe0ef`) so they
