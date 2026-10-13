@@ -16,7 +16,7 @@ skills/
   addyosmani/<skill-name>/SKILL.md     copies of addyosmani/agent-skills, on trial
   ponytail/<skill-name>/SKILL.md       copies of DietrichGebert/ponytail, on trial
   mine/<skill-name>/SKILL.md           skills authored in this registry
-plugins/ponytail/                      hooks and manifests of DietrichGebert/ponytail, not linked, for study
+plugins/ponytail/                      hooks and manifests of DietrichGebert/ponytail, not linked; hooks run in hoteldatahub only
 global/AGENTS.md                       global rules for every agent (see Global rules)
 global/hooks/                          global agent hooks (see Global hooks)
 ```
@@ -77,6 +77,11 @@ is registered by hand, by absolute path, in `~/.claude/settings.json` (`hooks.Pr
 - `project_overlay.py` (SessionStart): when the session's repo (worktrees included) is in its `OVERLAYS` table,
   injects that repo's overlay file as context. For repos whose own `CLAUDE.md` belongs to someone else, e.g.
   hoteldatahub -> `skills/work/_hoteldatahub/context.md` (local only; `skills/work/` is gitignored).
+- `ponytail_gate.js` (SessionStart, UserPromptSubmit, SubagentStart; Claude Code only): runs the matching
+  ponytail hook from `plugins/ponytail/hooks/` when the session's repo (worktrees included) is in its `REPOS`
+  set, today hoteldatahub, and exits silently anywhere else. Registered once per event, as
+  `node <repo>/global/hooks/ponytail_gate.js activate|mode-tracker|subagent`. It also writes
+  `~/.claude/.ponytail-statusline-nudged`, so ponytail never offers its statusline badge.
 
 ## Sources
 
@@ -202,8 +207,9 @@ Skills: `skills/ponytail/`: ponytail, ponytail-audit, ponytail-debt, ponytail-ga
 The rest of the Claude Code plugin is kept for study in `plugins/ponytail/`, outside `skills/` so the link scripts
 skip it: `.claude-plugin/`, `.codex-plugin/plugin.json`, `hooks/` (hook manifest, Node hook scripts, statusline
 scripts, `copilot-hooks.json` because the tests read it), `tests/hooks*.test.js`, `scripts/uninstall.js` (with
-`scripts/cursor-hooks.js`, which it requires), `AGENTS.md`, `README.md` and `INSTALL.md`. Its hooks are not
-registered anywhere.
+`scripts/cursor-hooks.js`, which it requires), `AGENTS.md`, `README.md` and `INSTALL.md`. Its hook manifest is not
+registered anywhere; the three Claude Code hook scripts run through `global/hooks/ponytail_gate.js`, in
+hoteldatahub sessions only (see Global hooks).
 
 Local changes:
 
