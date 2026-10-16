@@ -1,0 +1,5 @@
+interface:
+  display_name: "technical-drawing"
+  short_description: "Create drawings with zoom, color and vector exports"
+policy:
+  allow_implicit_invocation: false

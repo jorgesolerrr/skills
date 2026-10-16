@@ -15,6 +15,9 @@ skills/
   cursor/<skill-name>/SKILL.md         copies of cursor/plugins (cursor-team-kit, thermos), on trial
   addyosmani/<skill-name>/SKILL.md     copies of addyosmani/agent-skills, on trial
   ponytail/<skill-name>/SKILL.md       copies of DietrichGebert/ponytail, on trial
+  jakubkrehel/<skill-name>/SKILL.md    copies of jakubkrehel/skills (design), manual-only
+  codeswithroh/tastemaker/             fork of codeswithroh/tastemaker (design), manual-only
+  owl-listener/<skill-name>/SKILL.md   copies of Owl-Listener/designer-skills (design), manual-only
   mine/<skill-name>/SKILL.md           skills authored in this registry
 plugins/ponytail/                      hooks and manifests of DietrichGebert/ponytail, not linked; hooks run in hoteldatahub only
 global/AGENTS.md                       global rules for every agent (see Global rules)
@@ -221,6 +224,59 @@ Local changes:
   `ponytail-review` on any "review this".
 - Upstream's `tests/hooks.test.js` fails one assertion on Windows (#1032 statusline nudge path), in the upstream
   clone too.
+
+### jakubkrehel/skills
+
+Copied raw from the `skills/` folder of [jakubkrehel/skills](https://github.com/jakubkrehel/skills) at commit
+`4c66b1f`. Design skills. License: MIT, © 2026 Jakub Krehel (see `LICENSE-jakubkrehel`).
+
+Skills: `skills/jakubkrehel/`: better-accessibility, better-colors, better-interface, better-layout,
+better-typography, better-ui, better-writing, break, build-design, explain-interface, interface-review,
+state-machine, technical-drawing, variant.
+
+Local changes: all are manual-only (`disable-model-invocation: true`, and `allow_implicit_invocation: false` in
+`agents/openai.yaml` for Codex). Upstream lets the seven `better-*` skills, `build-design` and
+`technical-drawing` load on their own. `explain-interface` and `interface-review` hold bash snippets (`curl`,
+`mktemp`, `/tmp` worktrees) that run in Git Bash; `build-design` needs the Figma MCP.
+
+### codeswithroh/tastemaker
+
+Copied from the `skills/tastemaker/` folder of [codeswithroh/tastemaker](https://github.com/codeswithroh/tastemaker)
+at commit `792a28a`, with its nested `ideagram/` sub-skill (not linked on its own). License: MIT, © 2026
+codeswithroh (see `LICENSE-codeswithroh`).
+
+Skills: `skills/codeswithroh/tastemaker`.
+
+It writes `.tastemaker/` and `design/assets/` into the project and `~/.tastemaker/` (taste profile, history),
+fetches from Openverse and Iconify through an allowlist (`scripts/_netguard.py`), reads `PIXABAY_API_KEY` from the
+environment for `--source pixabay`, and points to `npx shadcn add` and CDN scripts. Pillow and cairosvg are
+optional pip deps.
+
+Local changes:
+
+- Manual-only (`disable-model-invocation: true`, and an `agents/openai.yaml` with
+  `allow_implicit_invocation: false`). Upstream triggers on nearly any UI request.
+- `python3` is `python` in every `.md` file, since Windows has no `python3`.
+- Scripts that read or write text files open them as UTF-8 (`fetch_photos.py`, and `build_library_index.py`,
+  `extract_component.py`, `recolor_undraw.py` under `ideagram/scripts/`), so Windows' cp1252 default doesn't
+  break on SVGs or non-Latin names.
+
+### Owl-Listener/designer-skills
+
+Copied raw from the `<plugin>/skills/` folders of
+[Owl-Listener/designer-skills](https://github.com/Owl-Listener/designer-skills) at commit `9a6930c`, flattened
+into one folder: design-ops, design-research, design-systems, designer-toolkit, interaction-design,
+prototyping-testing, ui-design, ux-strategy, visual-critique. Prose prompts only. The plugins' `commands/`
+are not copied. License: MIT, © 2026 MC Dean (see `LICENSE-owl-listener`).
+
+Skills: `skills/owl-listener/`, 111 of them, one per upstream skill folder.
+
+Local changes:
+
+- All are manual-only (`disable-model-invocation: true`, and an `agents/openai.yaml` with
+  `allow_implicit_invocation: false`). Upstream sets no invocation policy.
+- interaction-design's `state-machine` is renamed `interaction-state-machine`, since `jakubkrehel/state-machine`
+  holds the name; `micro-interaction-spec` points to the new name.
 
 ### Local (this registry)
 

@@ -1,0 +1,5 @@
+interface:
+  display_name: "Build Design"
+  short_description: "Build UI from a design file so it matches"
+policy:
+  allow_implicit_invocation: false
