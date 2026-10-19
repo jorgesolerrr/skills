@@ -125,11 +125,24 @@ Local changes to the forks:
 ### cathrynlavery/diagram-design
 
 Copied raw from the `skills/diagram-design/` folder of
-[cathrynlavery/diagram-design](https://github.com/cathrynlavery/diagram-design) at commit `648c2a5`
-(skill version 2.6). Includes `assets/`, `references/` and `scripts/` alongside `SKILL.md`.
-License: MIT (see `LICENSE-diagram-design`).
+[cathrynlavery/diagram-design](https://github.com/cathrynlavery/diagram-design) at commit `550fd66`
+(plugin 2.6.110; upstream has no tags). Includes `assets/`, `references/` and `scripts/` alongside
+`SKILL.md`. License: MIT (see `LICENSE-diagram-design`).
 
 Skills: `skills/cathrynlavery/diagram-design`.
+
+Local changes:
+
+- `SKILL.md` description is a short trigger line ("Draw a branded diagram or chart … Use when …") in
+  place of upstream's list of every type.
+- The "Don't use for" list drops the wiretext line; the skill ships no plain-text tool.
+- Repository-only verifiers (`<repo-root>/scripts/verify-geometry.py`, `verify-motion.py`, the skin linter)
+  are not shipped with the skill, so their mentions are dropped from `SKILL.md` §6/§9,
+  `references/primitives-core.md` rule 6 and `references/animation.md` (which points at
+  `scripts/self_check.py` instead). `references/type-architecture-delta.md` keeps its verifier but says it
+  needs a repository checkout.
+- Commands in `SKILL.md` say `python` with "use `python3` where that is the interpreter" (Windows).
+- The §9 label-rect check names the `paper` token instead of the literal `#f5f5f5`.
 
 ### cursor/plugins (pstack)
 
