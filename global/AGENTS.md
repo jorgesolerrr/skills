@@ -16,7 +16,9 @@ A check (tests, lint, format, typecheck) counts only by its exit code. When its 
 
 ## Shell
 
-Write multi-line content (files, scripts, issue and PR bodies) with Write or Edit; to run a script, Write it to the scratchpad and run the file. Bash heredocs fail on this machine when the body holds a quote.
+Change files with Edit, or with Write for a new file or a full rewrite. Never edit a file through a script, `sed`, or a heredoc.
+
+Bash heredocs fail on this machine when the body holds a quote. When a command needs multi-line text, such as a PR or issue body or a script to run, Write it to a file in the scratchpad and pass the path (`gh pr create --body-file <path>`, `python <path>`).
 
 Read diffs by `git diff --stat` first, then per file. Read GitHub data with `--json <fields> -q`.
 
