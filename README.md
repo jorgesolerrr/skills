@@ -344,3 +344,10 @@ Skills authored here, not copied from an upstream source.
 - `skills/mine/new-coder/`: new-coder. Creates a kinby `coder` software factory on the playground hub for a
   GitHub repository: labels, check commands from the repo's gate, the instance via `create_coder.py` over ssh,
   then a health and webhook check.
+- `skills/mine/browser-pass/`: browser-pass. Walks a checklist of browser checks (a GitHub issue or PR's
+  boxes, a test-plan file, or checks typed in chat) against any web app in Playwright's bundled Chromium:
+  picks the target (a named URL, else the project's dev server), one check script per box, judges from
+  screenshots plus the console errors and failing requests `browser.py` collects, and files each failure as a
+  GitHub issue linked from its box. Generalized from kinby's `e2e-pass` (`jorgesolerrr/kinby`,
+  `.claude/skills/e2e-pass/`), without its deploy, hub and secret-seeding steps; `browser.py` keeps its
+  PID-only cleanup and stored sessions (`~/.browser-pass/`).
