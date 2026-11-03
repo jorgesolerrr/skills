@@ -18,6 +18,7 @@ skills/
   jakubkrehel/<skill-name>/SKILL.md    copies of jakubkrehel/skills (design), manual-only
   codeswithroh/tastemaker/             fork of codeswithroh/tastemaker (design), manual-only
   owl-listener/<skill-name>/SKILL.md   copies of Owl-Listener/designer-skills (design), manual-only
+  vincentsch/explainroo/               copy of vincentsch/explainroo's skill (explainer videos)
   mine/<skill-name>/SKILL.md           skills authored in this registry
 plugins/ponytail/                      hooks and manifests of DietrichGebert/ponytail, not linked; hooks run in hoteldatahub only
 global/AGENTS.md                       global rules for every agent (see Global rules)
@@ -290,6 +291,21 @@ Local changes:
   `allow_implicit_invocation: false`). Upstream sets no invocation policy.
 - interaction-design's `state-machine` is renamed `interaction-state-machine`, since `jakubkrehel/state-machine`
   holds the name; `micro-interaction-spec` points to the new name.
+
+### vincentsch/explainroo
+
+Copied raw from the `skills/explainroo/` folder of [vincentsch/explainroo](https://github.com/vincentsch/explainroo)
+at commit `e95232c` (tag `v0.4.1` plus one README commit). License: MIT, © 2026 Vincent Schmalbach
+(see `LICENSE-vincentsch`).
+
+Skills: `skills/vincentsch/explainroo`.
+
+The skill drives the explainroo CLI, which is not vendored here. When neither `explainroo` on PATH nor
+`~/.explainroo/bin/explainroo.js` exists, it clones the repo into `~/.explainroo`, runs `npm install` and
+`doctor --fetch` (downloads about 400 MB of voice and timing models). Needs Node.js 20.11+, ffmpeg and
+Chrome. ElevenLabs voices are optional and need an API key.
+
+Local changes: none.
 
 ### Local (this registry)
 
